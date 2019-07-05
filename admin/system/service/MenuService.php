@@ -148,9 +148,6 @@ class MenuService extends BaseService
      */
     public function getChildMenus($parent_id = 0, $i = 0)
     {
-        $redis = RedisConnect::getInstance();
-        $key = 'delcache-menu-' . $parent_id . '-' . $i;
-//        if (!$redis->exists($key)) {
         $types = [];
         if ($parent_id == 0) {
             $types[] = ['id' => $parent_id, 'name' => '顶级目录'];
@@ -167,10 +164,6 @@ class MenuService extends BaseService
             $childTypes = $this->getChildMenus($v['id'], $i);
             $types = array_merge($types, $childTypes);
         }
-//            $redis->set($key, json_encode($types), 3600);
-//        } else {
-//            $types = json_decode($redis->get($key), true);
-//        }
         return $types;
     }
 
