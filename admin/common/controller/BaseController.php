@@ -5,10 +5,15 @@ namespace admin\common\controller;
 use admin\system\service\MenuService;
 use core\Controller;
 use core\Db;
+use core\Request;
 
 class BaseController extends Controller
 {
     public $user;
+    protected $scriptList = [];
+
+    /** @var Request $request */
+    public $request;
 
     /**
      * @throws \Exception
@@ -17,6 +22,7 @@ class BaseController extends Controller
     {
         $this->user = isset($_SESSION['user']) ? $_SESSION['user'] : [];
         $this->validateUserGrant();
+        $this->setMenu();
         parent::init();
     }
 
@@ -128,7 +134,6 @@ class BaseController extends Controller
             if (!$roleAdmin) {
                 throw new \Exception('您暂无该权限');
             }
-            $this->setCurrentMenu($uri);
         } catch (\Exception $e) {
             if (!$this->request->isAjax() && $e->getCode() == 1111) {
                 $this->redirect('system/public/login');
@@ -141,9 +146,14 @@ class BaseController extends Controller
      * @param $uri
      * @throws \Exception
      */
-    private function setCurrentMenu($uri){
-        $menus = (new menuService())->menus($this->request->uri);
-        $this->assign('menus', $menus);
+    private function setMenu()
+    {
+        if(!empty($this->user)){
+            $admin_id = $this->user['admin_id'];
+            $menus = (new menuService())->menus($admin_id, $this->request->uri);
+            $this->assign('menus', $menus);
+        }
+
     }
 
     public function checkWhiteList($moduleName, $actionName = null)
@@ -166,4 +176,114 @@ class BaseController extends Controller
         }
         return false;
     }
+
+    /**
+     * 自动渲染使用
+     * @param $module
+     * @param $controller
+     * @param $action
+     * @throws \Exception
+     */
+    public function display($uri = '')
+    {
+        $route = $uri != '' ? explode('/', trim($uri)) : [];
+        $view = '';
+        if (count($route) == 0) {
+            $action = $this->request->action . '.php';
+
+            $view = APP_PATH . $this->request->module . '/views/' . $this->request->controller . '/';
+        } else if (count($route) == 1) {
+            $action = $uri . '.php';
+
+            $view = APP_PATH . $this->request->module . '/views/' . $this->request->controller . '/';
+        } else if (count($route) == 2) {
+            $action = $route[1] . '.php';
+
+            $view = APP_PATH . $this->request->module . '/views/' . $route[0] . '/';
+        } else if (count($route) == 3) {
+            $action = $route[2] . '.php';
+            $view = APP_PATH . $route[0] . '/views/' . $route[1] . '/';
+        }
+        $view = $view . strtolower(trim(preg_replace('/([A-Z])/', '-$1', $action)));
+        if (!$view || !file_exists($view)) {
+            throw new \Exception('view is missing!', 500);
+        }
+        include COMMON_PATH . 'layout/' . $this->layout . '.php';
+        exit();
+    }
+
+    /**
+     * @param string $message
+     * @param array $data
+     * @throws \Exception
+     */
+    public function success($message = '', $data = [])
+    {
+        if ($this->request->isAjax()) {
+            parent::success($message, $data);
+        }
+        $this->layout('empty');
+        $this->assign('message', $message);
+        $this->assign('data', $data);
+        $this->display('public/success');
+    }
+
+    /**
+     * @param string $message
+     * @param array $data
+     * @throws \Exception
+     */
+    public function error($message = '', $data = [])
+    {
+        if ($this->request->isAjax()) {
+            parent::error($message, $data);
+        }
+        $this->layout('empty');
+        $this->assign('message', $message);
+        $this->assign('data', $data);
+        $this->display('public/error');
+    }
+
+
+    public function createUrl($uri, $option = [])
+    {
+        $res = $this->request->parseUri($uri);
+        $option = array_merge($res['params'], $option);
+        $url = '/' . $res['module'] . '/' . $res['controller'] . '/' . $res['action'];
+        if (count($option)) {
+            $url .= '?' . http_build_query($option);
+        }
+        return $url;
+    }
+
+    public function redirect($url, $option=[])
+    {
+        $url = strpos($url, 'http') !== false ? $url : $this->createUrl($url, $option);
+        //多行URL地址支持
+        if (!headers_sent()) {
+            // redirect
+            header('Location: ' . $url);
+            exit;
+        } else {
+            $str = "<meta http-equiv='Refresh' content='URL={$url}'>";
+            exit($str);
+        }
+    }
+
+    public function layout($default = 'main')
+    {
+        $this->layout = $default;
+    }
+
+    public function appendScript($script)
+    {
+        if (strpos($script, '/') !== 0) {
+            $script = '/static/js/' . $script;
+        }
+        if (!in_array($script, $this->scriptList)) {
+            $this->scriptList[] = $script;
+        }
+        return $this;
+    }
+
 }

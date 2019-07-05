@@ -1,4 +1,4 @@
-<form id="save-form" action="<?= $this->createUrl('system/menu/editMenu') ?>" method="post">
+<form id="save-form" action="<?= $this->createUrl('system/role/editRole') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">角色名称</label>

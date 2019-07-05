@@ -44,9 +44,27 @@ class MenuService extends BaseService
      * @return array
      * @throws \Exception
      */
-    public function menus($uri)
+    public function menus($adminId, $uri)
     {
-        $menuList = Db::table('Menu')->where(['status' => 1])->order('sort desc')->findAll();
+        $admin = Db::table('Admin')->where(['admin_id' => $adminId])->find();
+        $menuIdList = [];
+        if (!$admin) {
+            throw new \Exception('用户有误');
+        }
+
+        $roleIdList = Db::table('RoleAdmin')->field(['role_id'])->where(['admin_id' => $adminId])->findAll();
+        if (count($roleIdList)) {
+            $roleIdList = array_column($roleIdList, 'role_id');
+            $menuIdList = Db::table('RoleMenu')
+                ->field(['menu_id'])->where('role_id in (' . implode(',', $roleIdList) . ')')
+                ->findAll();
+            $menuIdList = array_column($menuIdList, 'menu_id');
+        }
+        $selector = Db::table('Menu')->where(['status' => 1]);
+        if ($admin['identity'] == 0) {
+            $selector->where('id in (' . implode(',', $menuIdList) . ')');
+        }
+        $menuList = $selector->order('sort desc')->findAll();
         foreach ($menuList as $v) {
             if ($v['parent_id'] == 0) {
                 $topList[$v['id']] = $v;
