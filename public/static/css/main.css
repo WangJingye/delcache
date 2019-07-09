@@ -63,8 +63,6 @@
 @media (min-width: 1200px) {
     .bd-sidebar {
         -webkit-box-flex: 0;
-        -ms-flex: 0 1 320px;
-        flex: 0 1 320px
     }
 }
 

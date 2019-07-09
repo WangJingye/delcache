@@ -14,7 +14,6 @@ use core\Db;
 
 class RoleService extends BaseService
 {
-
     /**
      * @param $params
      * @return array

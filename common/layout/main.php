@@ -2,26 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="/static/plugin/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" href="/static/plugin/bootstrap/css/fonts.css">
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/select2.css">
-    <link rel="stylesheet" href="/static/css/ztree.css">
-    <script src="/static/js/jquery.js"></script>
-    <script src="/static/plugin/bootstrap/js/bootstrap.js"></script>
-    <script src="/static/js/jquery.validate.js"></script>
-    <script src="/static/js/select2.min.js"></script>
-    <script src="/static/js/toastr.js"></script>
-    <script src="/static/js/ztree.core.js"></script>
-    <script src="/static/js/ztree.excheck.js"></script>
-</head>
+    <title>后台管理系统</title>
+    <?php foreach ($this->cssList as $css): ?>
+        <link rel="stylesheet" href="<?= $css ?>">
+    <?php endforeach; ?></head>
 <body>
 <header class="navbar navbar-expand navbar-dark bg-primary bd-navbar">
     <a class="navbar-brand" href="/">
-        <img src="https://v4.bootcss.com/assets/brand/bootstrap-solid.svg" width="30" height="30"
-             class="d-inline-block align-top" alt="">
-        Bootstrap
+        delcache
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,11 +29,12 @@
     <ul class="navbar-nav">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                <img class="border border-info rounded-circle" src="<?= $this->user['avatar'] ?>" style="width:30px;height:30px">
+                <img class="border border-info rounded-circle" src="<?= $this->user['avatar'] ?>"
+                     style="width:30px;height:30px">
                 <span><?= $this->user['realname'] ?></span>
             </a>
             <div class="dropdown-menu">
-                <a class="dropdown-item" href="<?=$this->createUrl('system/public/logout')?>">登出</a>
+                <a class="dropdown-item" href="<?= $this->createUrl('system/public/logout') ?>">登出</a>
             </div>
         </li>
     </ul>
@@ -99,7 +88,6 @@
 <?php foreach ($this->scriptList as $script): ?>
     <script src="<?= $script ?>"></script>
 <?php endforeach; ?>
-<script src="/static/js/admin/main.js"></script>
 <script>
     $(function () {
         $('.main-item').click(function () {

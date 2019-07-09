@@ -10,6 +10,8 @@
 namespace admin\system\service;
 
 use admin\common\service\BaseService;
+use common\extend\encrypt\Encrypt;
+use core\Config;
 use core\Db;
 
 class AdminService extends BaseService
@@ -59,8 +61,8 @@ class AdminService extends BaseService
                 unset($data['admin_id']);
             }
             $data['salt'] = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-            $password = config('default-password');
-            $data['password'] = encryptPassword($password == '' ? '123456' : $password, $data['salt']);
+            $password = Config::get('default-password');
+            $data['password'] = Encrypt::encryptPassword($password == '' ? '123456' : $password, $data['salt']);
             Db::table('Admin')->insert($data);
         }
     }

@@ -6,6 +6,7 @@ namespace admin\system\controller;
 use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
 use common\extend\captcha\Captcha;
+use common\extend\encrypt\Encrypt;
 use core\Db;
 
 class PublicController extends BaseController
@@ -28,7 +29,7 @@ class PublicController extends BaseController
                     throw new \Exception('验证码不正确');
                 }
                 $user = Db::table('Admin')->where(['username' => $params['username']])->find();
-                if ($user['password'] != encryptPassword($params['password'], $user['salt'])) {
+                if ($user['password'] != Encrypt::encryptPassword($params['password'], $user['salt'])) {
                     throw new \Exception('用户名密码不正确');
                 }
                 $user['last_login_time'] = time();

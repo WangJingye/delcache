@@ -10,7 +10,7 @@
 namespace admin\system\service;
 
 use admin\common\service\BaseService;
-use common\extend\redis\RedisConnect;
+use core\Config;
 use core\Db;
 
 class MenuService extends BaseService
@@ -174,14 +174,12 @@ class MenuService extends BaseService
     public function getAllMethodList($menu_id = 0)
     {
         $list = get_declared_classes();
-
-
         $baseMethodList = get_class_methods('admin\common\controller\BaseController');
         $existMethodList = Db::table('Menu')->field(['url', 'id'])->where('url != ""')->findAll();
         $existMethodList = array_column($existMethodList, 'url', 'id');
         $currentMethod = isset($existMethodList[$menu_id]) ? $existMethodList[$menu_id] : '';
         $uriList = [];
-        foreach (config('module_list') as $module) {
+        foreach (Config::get('module_list') as $module) {
             $list = scandir(APP_PATH . $module . '/controller/');
             foreach ($list as $v) {
                 if ($v == '.' || $v == '..') {

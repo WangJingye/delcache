@@ -20,6 +20,7 @@ class Request
     public $uri;
     public $defaultUri;
 
+    public static $instance;
     /**
      * Db constructor.
      * @param array $config
@@ -28,6 +29,12 @@ class Request
     public function __construct()
     {
 
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function parseParams(){
         $res = $this->parseUri(isset($_GET['s']) ? $_GET['s'] : '');
         $this->module = $res['module'];
         $this->action = $res['action'];
@@ -45,12 +52,29 @@ class Request
         $this->params = $this->trimString($_REQUEST);
     }
 
+    /**
+     * @return Request
+     * @throws \Exception
+     */
+    public static function instance()
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * @param $uri
+     * @return array
+     * @throws \Exception
+     */
     public function parseUri($uri)
     {
         $route = $uri ? explode('/', $uri) : [];
         $config = $this->config;
         if (!$config) {
-            $config = config();
+            $config = Config::get();
             $this->defaultUri = $config['default_module'] . '/' . $config['default_controller'] . '/' . $config['default_action'];
             $this->config = $config;
         }

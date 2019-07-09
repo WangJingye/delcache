@@ -3,6 +3,7 @@
 namespace admin\common\controller;
 
 use admin\system\service\MenuService;
+use core\Config;
 use core\Controller;
 use core\Db;
 use core\Request;
@@ -10,7 +11,33 @@ use core\Request;
 class BaseController extends Controller
 {
     public $user;
-    protected $scriptList = [];
+
+    /**
+     * 界面js
+     * @var array
+     */
+    protected $scriptList = [
+        '/static/js/jquery.js',
+        '/static/plugin/bootstrap/js/bootstrap.js',
+        '/static/js/jquery.validate.js',
+        '/static/js/select2.min.js',
+        '/static/js/toastr.js',
+        '/static/js/ztree.core.js',
+        '/static/js/ztree.excheck.js',
+        '/static/js/main.js',
+    ];
+
+    /**
+     * 界面css
+     * @var array
+     */
+    protected $cssList = [
+        '/static/plugin/bootstrap/css/bootstrap.css',
+        '/static/plugin/bootstrap/css/fonts.css',
+        '/static/css/main.css',
+        '/static/css/select2.css',
+        '/static/css/ztree.css',
+    ];
 
     /** @var Request $request */
     public $request;
@@ -24,6 +51,12 @@ class BaseController extends Controller
         $this->validateUserGrant();
         $this->setMenu();
         parent::init();
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+
     }
 
     public function pagination($service)
@@ -148,7 +181,7 @@ class BaseController extends Controller
      */
     private function setMenu()
     {
-        if(!empty($this->user)){
+        if (!empty($this->user)) {
             $admin_id = $this->user['admin_id'];
             $menus = (new menuService())->menus($admin_id, $this->request->uri);
             $this->assign('menus', $menus);
@@ -156,11 +189,15 @@ class BaseController extends Controller
 
     }
 
+    /**
+     * @param $moduleName
+     * @param null $actionName
+     * @return bool
+     * @throws \Exception
+     */
     public function checkWhiteList($moduleName, $actionName = null)
     {
-        $action = [
-            'system/public' => ['login', 'logout', 'captcha', 'error'],
-        ];
+        $action = Config::get('actionWhiteList');
 
         $moduleName = strtolower($moduleName);
         $actionName = strtolower($actionName);
@@ -256,7 +293,7 @@ class BaseController extends Controller
         return $url;
     }
 
-    public function redirect($url, $option=[])
+    public function redirect($url, $option = [])
     {
         $url = strpos($url, 'http') !== false ? $url : $this->createUrl($url, $option);
         //多行URL地址支持

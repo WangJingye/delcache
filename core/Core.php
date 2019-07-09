@@ -9,8 +9,6 @@
 
 namespace core;
 
-include 'function.php';
-
 class Core
 {
 
@@ -20,11 +18,13 @@ class Core
     public static function run()
     {
         try {
-            $route = new Request();
-            $action = $route->action;
-            $controller = $route->controller;
+            Config::init();
+            $request = Request::instance();
+            $request->parseParams();
+            $action = $request->action;
+            $controller = $request->controller;
             $controller = ucfirst($controller) . 'Controller';
-            $controller = ('admin\\' . $route->module . '\\controller' . '\\' . $controller);
+            $controller = ('admin\\' . $request->module . '\\controller' . '\\' . $controller);
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
                 throw new \Exception('404 NOT FOUND controller is not exist', 404);
             }
@@ -33,7 +33,7 @@ class Core
             if (!in_array($action, get_class_methods($controller))) {
                 throw new \Exception('404 NOT FOUND action is not exist', 404);
             }
-            $controller->request = $route;
+            $controller->request = $request;
             $controller->layout('main');
             $controller->init();
             //执行action

@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/5/27
- * Time: 9:01 PM
- */
-
 $configs = [
     // 默认模块名
     'default_module' => 'system',

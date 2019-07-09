@@ -5,6 +5,7 @@ namespace admin\system\controller;
 
 use admin\common\controller\BaseController;
 use admin\system\service\RoleService;
+use core\Config;
 use core\Db;
 
 class RoleController extends BaseController
