@@ -8,6 +8,7 @@ use admin\system\service\AdminService;
 use common\extend\captcha\Captcha;
 use common\extend\encrypt\Encrypt;
 use core\Db;
+use core\Util;
 
 class PublicController extends BaseController
 {
@@ -34,7 +35,7 @@ class PublicController extends BaseController
                 }
                 $user['last_login_time'] = time();
                 Db::table('Admin')->where(['admin_id' => $user['admin_id']])->update($user);
-                $_SESSION['user'] = $user;
+                Util::session_set('user',$user);
                 $this->success('登录成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
@@ -45,7 +46,7 @@ class PublicController extends BaseController
 
     public function logout()
     {
-        unset($_SESSION['user']);
+        Util::session_unset('user');
         $this->redirect('system/public/login');
     }
 

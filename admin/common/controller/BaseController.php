@@ -7,6 +7,7 @@ use core\Config;
 use core\Controller;
 use core\Db;
 use core\Request;
+use core\Util;
 
 class BaseController extends Controller
 {
@@ -47,7 +48,8 @@ class BaseController extends Controller
      */
     public function init()
     {
-        $this->user = isset($_SESSION['user']) ? $_SESSION['user'] : [];
+        $user = Util::session_get('user');
+        $this->user = $user ? $user : [];
         $this->validateUserGrant();
         $this->setMenu();
         parent::init();

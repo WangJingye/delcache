@@ -13,7 +13,7 @@ class Controller
 {
     /** @var Controller $this */
 
-    protected $var = [];
+    protected $variation = [];
 
     public function init()
     {
@@ -31,13 +31,13 @@ class Controller
     public function __set($name, $value)
     {
         if (trim($name) != '') {
-            $this->var[$name] = $value;
+            $this->variation[$name] = $value;
         }
     }
 
     public function __get($name)
     {
-        return isset($this->var[$name]) ? $this->var[$name] : '';
+        return isset($this->variation[$name]) ? $this->variation[$name] : '';
     }
 
     public function success($message = '', $data = [])

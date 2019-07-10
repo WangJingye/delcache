@@ -1,5 +1,6 @@
 <?php
 
+
 // 调试模式开关
 define("APP_DEBUG", true);
 
@@ -11,11 +12,9 @@ define('CORE_PATH', BASE_PATH . 'core/');
 define('COMMON_PATH', BASE_PATH . 'common/');
 ini_set('date.timezone', 'Asia/Shanghai');
 //自动加载类
-function __autoload($classname)
-{
+spl_autoload_register(function($classname) {
     require_once BASE_PATH . str_replace('\\', '/', $classname) . '.php';
-}
-session_start();
+});
 if (APP_DEBUG) {
     ini_set('display_errors', 'On');
     error_reporting(E_ALL);

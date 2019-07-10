@@ -5,7 +5,7 @@ namespace core;
 class Db
 {
     /** @var  \PDO */
-    public static $db;
+    public $db;
     private $condition = '';
     private $database = [];
     private $table_name = '';
@@ -13,6 +13,7 @@ class Db
     private $limit = '';
     private $order = '';
 
+    private static $instance;
 
     /**
      * Db constructor.
@@ -27,24 +28,39 @@ class Db
         if (empty($database)) {
             throw new \Exception('database config is missing！', 500);
         }
-        if (static::$db == null) {
-            $db = new \PDO("mysql:host={$database['hostname']};dbname={$database['database']};port={$database['port']}", $database['username'], $database['password']);
-            $db->query("SET NAMES " . $database['charset']);
-            static::$db = $db;
+        if (is_null($this->db)) {
+            $this->db = new \PDO("mysql:host={$database['hostname']};dbname={$database['database']};port={$database['port']}", $database['username'], $database['password']);
+            $this->db->setAttribute(\PDO::ATTR_PERSISTENT , false);
+            $this->db->query("SET NAMES " . $database['charset']);
         }
         $this->database = $database;
     }
 
     /**
+     * @param array $database
+     * @return Db
+     * @throws \Exception
+     */
+    public static function instance($database = [])
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new static($database);
+        }
+        return self::$instance;
+    }
+
+    /**
      * @param $table
      * @return Db
+     * @throws \Exception
      */
     public static function table($table)
     {
-        $static = new static();
-        $table = $static->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', $table), '_');
-        $static->table_name = strtolower($table);
-        return $static;
+        $instance = Db::instance();
+        $instance->clear();
+        $table = $instance->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', $table), '_');
+        $instance->table_name = strtolower($table);
+        return $instance;
     }
 
     /**
@@ -104,52 +120,59 @@ class Db
     /**
      * @param string $sql
      * @return mixed
+     * @throws \Exception
      */
     public function find($sql = '')
     {
         if (!$sql) {
             $sql = $this->getSql();
         }
-        $stat = static::$db->query($sql);
+        $stat = $this->db->query($sql);
         if ($stat) {
             $data = $stat->fetch(\PDO::FETCH_ASSOC);
         } else {
-            $error = static::$db->errorInfo();
+            $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
         return $data;
     }
 
     /**
-     * @param $sql
-     * @return array
+     * @param string $sql
+     * @return mixed
+     * @throws \Exception
      */
     public function findAll($sql = '')
     {
         if (!$sql) {
             $sql = $this->getSql();
         }
-        $stat = static::$db->query($sql);
+        $stat = $this->db->query($sql);
         if ($stat) {
             $list = $stat->fetchAll(\PDO::FETCH_ASSOC);
         } else {
-            $error = static::$db->errorInfo();
+            $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
         return $list;
     }
 
+    /**
+     * @param string $sql
+     * @return mixed
+     * @throws \Exception
+     */
     public function count($sql = '')
     {
         if (!$sql) {
             $sql = $this->getSql('count(*) as count');
         }
-        $stat = static::$db->query($sql);
+        $stat = $this->db->query($sql);
         if ($stat) {
             $count = $stat->fetch(\PDO::FETCH_ASSOC);
             return $count['count'];
         } else {
-            $error = static::$db->errorInfo();
+            $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
     }
@@ -181,18 +204,12 @@ class Db
         return $this;
     }
 
-    public function rename($rename)
-    {
-        $this->rename = $rename;
-        return $this;
-    }
-
     /**
      * @throws \Exception
      */
     public static function startTrans()
     {
-        static::$db->beginTransaction();
+        Db::instance()->db->beginTransaction();
     }
 
     /**
@@ -200,7 +217,7 @@ class Db
      */
     public static function rollback()
     {
-        static::$db->rollBack();
+        Db::instance()->db->rollBack();
     }
 
     /**
@@ -208,7 +225,7 @@ class Db
      */
     public static function commit()
     {
-        static::$db->commit();
+        Db::instance()->db->commit();
     }
 
     /**
@@ -217,7 +234,7 @@ class Db
     public function update($data)
     {
         $sql = $this->array2sql($this->table_name, $data, 'update', $this->condition);
-        static::$db->exec($sql);
+        $this->db->exec($sql);
     }
 
     /**
@@ -227,13 +244,14 @@ class Db
     public function insert($data)
     {
         $sql = $this->array2sql($this->table_name, $data);
-        static::$db->exec($sql);
-        return static::$db->lastInsertId();
+        $this->db->exec($sql);
+        return $this->db->lastInsertId();
     }
 
     /**
      * @param array $data
      * @return string
+     * @throws \Exception
      */
     public function multiInsert($list)
     {
@@ -246,12 +264,16 @@ class Db
             $sql = 'insert ignore into ' . $this->table_name . ' (`' . implode('`,`', array_keys($data)) . '`) values ';
         }
         $sql .= implode(',', $dataSql);
-        if (static::$db->exec($sql) === false) {
-            $error = static::$db->errorInfo();
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
     }
 
+    /**
+     * @param array $where
+     * @throws \Exception
+     */
     public function delete($where = [])
     {
         if (!empty($where)) {
@@ -264,12 +286,19 @@ class Db
         if ($this->limit) {
             $sql .= ' limit ' . $this->limit;
         }
-        if (static::$db->exec($sql) === false) {
-            $error = static::$db->errorInfo();
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
     }
 
+    /**
+     * @param $tableName
+     * @param $data
+     * @param string $type
+     * @param string $condition
+     * @return string
+     */
     public static function array2sql($tableName, $data, $type = 'insert', $condition = '')
     {
         if (empty($data)) {
@@ -291,6 +320,14 @@ class Db
             $sql = 'update ' . $tableName . ' set ' . implode(',', $fields) . $condition;
         }
         return $sql;
+    }
+
+    protected function clear()
+    {
+        $this->condition = '';
+        $this->fields = '*';
+        $this->limit = '';
+        $this->order = '';
     }
 
 }

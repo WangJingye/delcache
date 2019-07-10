@@ -5,7 +5,6 @@ namespace admin\system\controller;
 
 use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
-use common\extend\excel\SpreadExcel;
 use core\Db;
 
 class AdminController extends BaseController
