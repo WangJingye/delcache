@@ -2,7 +2,7 @@
 
 return [
     // 服务器地址
-    'hostname' => '121.40.224.59',
+    'hostname' => '127.0.0.1',
     // 数据库名
     'database' => 'base',
     // 用户名
