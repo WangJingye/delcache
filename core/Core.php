@@ -26,7 +26,7 @@ class Core
             $action = $request->action;
             $controller = $request->controller;
             $controller = ucfirst($controller) . 'Controller';
-            $controller = ('admin\\' . $request->module . '\\controller' . '\\' . $controller);
+            $controller = (APP . '\\' . $request->module . '\\controller' . '\\' . $controller);
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
                 throw new \Exception('Controller is not exist', 404);
             }
@@ -37,12 +37,17 @@ class Core
                 throw new \Exception('Action is not exist', 404);
             }
             $controller->request = $request;
-            $controller->layout('main');
+            if (APP == 'admin') {
+                $controller->layout('main');
+            }
             $controller->init();
             //执行action
             $controller->$action();
-            //渲染界面
-            $controller->display();
+
+            if (APP == 'admin') {
+                //渲染界面
+                $controller->display();
+            }
         } catch (\Exception $e) {
             $errorCode = $e->getCode();
             if ($errorCode == 0) {

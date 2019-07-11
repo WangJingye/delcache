@@ -7,6 +7,7 @@ define("APP_DEBUG", true);
 define('BASE_PATH', dirname(__DIR__) . '/');
 define('PUBLIC_PATH', dirname(__FILE__) . '/');
 
+define('APP', 'admin');
 define('APP_PATH', BASE_PATH . 'admin/');
 define('CORE_PATH', BASE_PATH . 'core/');
 define('COMMON_PATH', BASE_PATH . 'common/');

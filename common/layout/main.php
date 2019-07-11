@@ -2,42 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,maximum-scale=1.0, initial-scale=1">
     <title>后台管理系统</title>
     <?php foreach ($this->cssList as $css): ?>
         <link rel="stylesheet" href="<?= $css ?>">
-    <?php endforeach; ?></head>
+    <?php endforeach; ?>
+</head>
 <body>
-<header class="navbar navbar-expand navbar-dark bg-primary bd-navbar">
-    <a class="navbar-brand" href="/">
-        delcache
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+
+<header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar">
+    <div class="col-3 col-md-3 col-xl-2">
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-toggle="dropdown">
+                    <img class="rounded-circle" src="<?= $this->user['avatar'] ?>"
+                         style="width:30px;height:30px">
+                    <span><?= $this->user['realname'] ?></span>
+                </a>
+                <div class="dropdown-menu" style="position: absolute">
+                    <a class="dropdown-item" href="<?= $this->createUrl('system/public/logout') ?>">登出</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#top-menu-list"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse">
-        <ul class="navbar-nav">
+    <div class="collapse navbar-collapse" id="top-menu-list">
+        <div class="navbar-nav">
             <?php foreach ($this->menus['topList'] as $v): ?>
-                <li class="nav-item <?= $v['id'] == $this->menus['active']['topId'] ? 'active' : '' ?>">
-                    <a class="nav-link"
-                       href="<?= $v['url'] != '' ? $this->createUrl($v['url']) : 'javascript:void(0)' ?>"><i
-                                class="<?= $v['icon'] ?>"></i> <?= $v['name'] ?></span></a>
-                </li>
+                <a class="nav-item nav-link <?= $v['id'] == $this->menus['active']['topId'] ? 'active' : '' ?>"
+                   href="<?= $v['url'] != '' ? $this->createUrl($v['url']) : 'javascript:void(0)' ?>">
+                    <span><i class="<?= $v['icon'] ?>"></i> <?= $v['name'] ?></span>
+                </a>
             <?php endforeach; ?>
-        </ul>
+        </div>
     </div>
-    <ul class="navbar-nav">
-        <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                <img class="border border-info rounded-circle" src="<?= $this->user['avatar'] ?>"
-                     style="width:30px;height:30px">
-                <span><?= $this->user['realname'] ?></span>
-            </a>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="<?= $this->createUrl('system/public/logout') ?>">登出</a>
-            </div>
-        </li>
-    </ul>
 </header>
 <div class="row flex-xl-nowrap" style="margin:0">
     <div class="col-12 col-md-3 col-xl-2 bd-sidebar" style="padding: 0">
@@ -47,7 +48,8 @@
                     <div><i class="<?= $v['icon'] ?>"></i> <?= $v['name'] ?></div>
                 </li>
                 <?php if (isset($this->menus['childList'][$v['id']]) && count($this->menus['childList'][$v['id']])): ?>
-                    <li class="list-group-item sub-item collapse <?= $v['id'] == $this->menus['active']['leftId'] ? 'show' : '' ?>">
+                    <li class="list-group-item sub-item collapse <?= $v['id'] == $this->menus['active']['leftId'] ? 'show' : '' ?>"
+                        style="border-top: 0">
                         <ul class="list-sub-item">
                             <?php foreach ($this->menus['childList'][$v['id']] as $child): ?>
                                 <li class="list-group-item <?= $this->menus['active']['childId'] == $child['id'] ? 'active' : '' ?>"

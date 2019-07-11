@@ -2,6 +2,7 @@
 
 namespace admin\common\controller;
 
+use admin\common\service\BaseService;
 use admin\system\service\MenuService;
 use core\Config;
 use core\Controller;
@@ -19,6 +20,7 @@ class BaseController extends Controller
      */
     protected $scriptList = [
         '/static/js/jquery.js',
+        '/static/plugin/bootstrap/js/popper.min.js',
         '/static/plugin/bootstrap/js/bootstrap.js',
         '/static/js/jquery.validate.js',
         '/static/js/select2.min.js',
@@ -61,21 +63,32 @@ class BaseController extends Controller
 
     }
 
+    /**
+     * @param BaseService $service
+     * @return string
+     */
     public function pagination($service)
     {
-        if ($service->totalPage <= 10) {
-            $startPage = 1;
-            $endPage = $service->totalPage;
-        } else if ($service->page + 4 >= $service->totalPage) {
-            $startPage = $service->totalPage - 9;
-            $endPage = $service->totalPage;
-        } else if ($service->page - 5 <= 0) {
-            $startPage = 1;
-            $endPage = 10;
-        } else {
-            $startPage = $service->page - 5;
-            $endPage = $service->page + 4;
+        $pageCount = 8;
+        $leftCount = $rightCount = (int)(floor($pageCount / 2));
+        //偶数时
+        if ($pageCount % 2 == 0) {
+            $leftCount = $rightCount - 1;
         }
+        if ($service->totalPage <= $pageCount) {
+            $startPage = 1;
+            $endPage = $service->totalPage;
+        } else if ($service->page + $rightCount >= $service->totalPage) {
+            $startPage = $service->totalPage - $pageCount + 1;
+            $endPage = $service->totalPage;
+        } else if ($service->page - $leftCount <= 0) {
+            $startPage = 1;
+            $endPage = $pageCount;
+        } else {
+            $startPage = $service->page - $leftCount;
+            $endPage = $service->page + $rightCount;
+        }
+        $params['pageSize'] = $service->pageSize;
         $html = '';
         if ($endPage > 1) {
             $params['page'] = $service->page == 1 ? 1 : $service->page - 1;
@@ -84,28 +97,32 @@ class BaseController extends Controller
                 $html .= '<option value="' . $i . '" ' . ($i == $service->pageSize ? 'selected' : '') . '>' . $i . '</option>';
             }
             $html .= '</select> 条/页</div>' .
-                '<ul class="pagination">' .
-                '<li class="page-item ' . ($service->page == 1 ? 'disabled' : '') . '">' .
-                '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '" aria-label="Previous">' .
-                '<span aria-hidden="true">&laquo;</span>' .
-                '<span class="sr-only">Previous</span>' .
-                '</a></li>';
-            $params['page'] = 1;
-            $html .= '<li class="page-item ' . ($service->page == 1 ? 'disabled' : '') . '">' .
-                '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">首页</a></li>';
+                '<ul class="pagination">' ;
+            if($service->page > 1) {
+                $html .= '<li class="page-item">' .
+                    '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '" aria-label="Previous">' .
+                    '<span aria-hidden="true">&laquo;</span>' .
+                    '<span class="sr-only">Previous</span>' .
+                    '</a></li>';
+                $params['page'] = 1;
+                $html .= '<li class="page-item ' . ($service->page == 1 ? 'disabled' : '') . '">' .
+                    '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">首页</a></li>';
+            }
             for ($i = $startPage; $i <= $endPage; $i++) {
                 $params['page'] = $i;
                 $html .= '<li class="page-item ' . ($service->page == $i ? 'active' : '') . '"><a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">' . $i . '</a></li>';
             }
-            $params['page'] = $service->totalPage;
-            $html .= '<li class="page-item ' . ($service->page == $service->totalPage ? 'disabled' : '') . '">' .
-                '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">末页</a></li>';
-            $params['page'] = $service->page == $endPage ? $endPage : $service->page + 1;
-            $html .= '<li class="page-item ' . ($service->page == $endPage ? 'disabled' : '') . '">' .
-                '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '" aria-label="Next">' .
-                '<span aria-hidden="true">&raquo;</span>' .
-                '<span class="sr-only">Next</span>' .
-                '</a></li></ul></div>';
+            if($service->page < $service->totalPage) {
+                $params['page'] = $service->totalPage;
+                $html .= '<li class="page-item ' . ($service->page == $service->totalPage ? 'disabled' : '') . '">' .
+                    '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">末页</a></li>';
+                $params['page'] = $service->page == $endPage ? $endPage : $service->page + 1;
+                $html .= '<li class="page-item ' . ($service->page == $endPage ? 'disabled' : '') . '">' .
+                    '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '" aria-label="Next">' .
+                    '<span aria-hidden="true">&raquo;</span>' .
+                    '<span class="sr-only">Next</span>' .
+                    '</a></li></ul></div>';
+            }
 
         }
         return $html;
