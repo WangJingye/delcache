@@ -9,10 +9,13 @@
 namespace core;
 class Util
 {
-    public static function session_set($name, $value = null)
+    public static function session_set($name, $value = null, $expire = null)
     {
         session_start();
         $_SESSION[$name] = $value;
+        if ($expire) {
+            $_SESSION[$name . '_expire'] = $expire + time();
+        }
         session_write_close();
     }
 
@@ -22,6 +25,9 @@ class Util
         session_start();
         if (isset($_SESSION[$name])) {
             $value = $_SESSION[$name];
+        }
+        if (isset($_SESSION[$name . '_expire']) && $_SESSION[$name . '_expire'] < time()) {
+            $value = null;
         }
         session_write_close();
         return $value;

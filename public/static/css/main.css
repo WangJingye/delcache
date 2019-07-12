@@ -187,23 +187,23 @@
 }
 
 .btn-box {
-    margin-top: 20px;
+    margin-top: 1rem;
     border-left: 1px;
     border-right: 1px;
-    border-top: 1px;
+    border-top:1px;
     border-bottom: 0;
     border-style: solid;
     border-color: #dee2e6;
-    padding: 5px;
+    padding: .5rem;
 }
 
 .pull-right {
-    margin-left: 5px;
+    margin-left: .5rem;
     float: right;
 }
 
 .pull-left {
-    margin-right: 5px;
+    margin-right: .5rem;
     float: left;
 }
 
@@ -228,7 +228,7 @@ h3 {
     border-top: 0;
     border-style: solid;
     border-color: #dee2e6;
-    padding: 5px;
+    padding: .5rem;
     font-size: 14px;
     align-items: center;
 }
@@ -240,6 +240,7 @@ h3 {
 }
 
 .pagination-list .page-container {
+    margin-right: 1rem;
     display: inline-flex;
     justify-content: flex-start;
 }
@@ -251,7 +252,7 @@ h3 {
 }
 
 .popup-content .alert {
-    margin-bottom: 5px;
+    margin-bottom: .5rem;
     box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.2);
 }
 

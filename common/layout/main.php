@@ -65,16 +65,10 @@
         <nav>
             <ol class="breadcrumb" style="border-radius: 0;">
                 <li class="breadcrumb-item"><a href="/"><i class="glyphicon glyphicon-home"></i> 主页</a></li>
-                <li class="breadcrumb-item"><a
-                            href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['topId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['topId']]['name'] ?></a>
-                </li>
-                <li class="breadcrumb-item"><a
-                            href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['leftId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['leftId']]['name'] ?></a>
-                </li>
+                <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['topList'][$this->menus['active']['topId']]['url']) ?>"><?= $this->menus['topList'][$this->menus['active']['topId']]['name'] ?></a></li>
+                <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['url']) ?>"><?= $this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['name'] ?></a></li>
                 <?php if (isset($this->menus['active']['endId'])): ?>
-                    <li class="breadcrumb-item"><a
-                                href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['childId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></a>
-                    </li>
+                    <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['childId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></a></li>
                     <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['endId']]['name'] ?></li>
                 <?php else: ?>
                     <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></li>

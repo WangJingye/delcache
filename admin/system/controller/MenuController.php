@@ -68,4 +68,19 @@ class MenuController extends BaseController
         $this->assign('childList', $childList);
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function setStatus()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            try {
+                $data = $this->request->params;
+                Db::table('Menu')->where(['id' => $data['id']])->update(['status' => $data['status']]);
+                $this->success('修改成功');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }
 }

@@ -55,7 +55,13 @@
                 <td>
                     <a href="<?= $this->createUrl('system/admin/editAdmin', ['admin_id' => $v['admin_id']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
-                    </a></td>
+                    </a>
+                    <?php if($v['status']==1):?>
+                        <div class="btn btn-danger btn-sm set-status-btn" data-id="<?= $v['admin_id'] ?>" data-status="0"><i class="glyphicon glyphicon-ban-circle"></i> 禁用</div>
+                    <?php else:?>
+                        <div class="btn btn-success btn-sm set-status-btn" data-id="<?= $v['admin_id'] ?>" data-status="1"><i class="glyphicon glyphicon-ok-circle"></i> 启用</div>
+                    <?php endif;?>
+                </td>
             </tr>
         <?php endforeach; ?>
         <?php if (!count($this->list)): ?>
@@ -67,3 +73,4 @@
     </table>
 </div>
 <?= $this->pagination ?>
+<?php $this->appendScript('admin/admin.js')?>

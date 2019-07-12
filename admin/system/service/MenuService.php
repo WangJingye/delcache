@@ -74,7 +74,7 @@ class MenuService extends BaseService
         $leftIds = [];
         foreach ($menuList as $v) {
             if (isset($topList[$v['parent_id']])) {
-                $leftList[$v['parent_id']][] = $v;
+                $leftList[$v['parent_id']][$v['id']] = $v;
                 $leftIds[] = $v['id'];
             }
         }
@@ -95,14 +95,18 @@ class MenuService extends BaseService
         }
 
         //头部导航设置跳转链接
-        foreach ($topList as $key => $v) {
-            if (isset($leftList[$v['id']][0]['id'])) {
-                $id = $leftList[$v['id']][0]['id'];
-                $arr = isset($childList[$id]) ? $childList[$id] : [];
-                foreach ($arr as $x) {
-                    if ($x['url'] != '') {
-                        $topList[$key]['url'] = $x['url'];
-                        break;
+        foreach ($topList as $topId => $v) {
+            if (isset($leftList[$v['id']])) {
+                foreach ($leftList[$v['id']] as $leftId => $x) {
+                    $arr = isset($childList[$leftId]) ? $childList[$leftId] : [];
+                    foreach ($arr as $y) {
+                        if ($topList[$topId]['url'] == '' && $y['url'] != '') {
+                            $topList[$topId]['url'] = $y['url'];
+                        }
+                        if ($leftList[$v['id']][$leftId]['url'] == '' && $y['url'] != '') {
+                            $leftList[$v['id']][$leftId]['url'] = $y['url'];
+                            break;
+                        }
                     }
                 }
             }

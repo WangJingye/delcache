@@ -97,8 +97,8 @@ class BaseController extends Controller
                 $html .= '<option value="' . $i . '" ' . ($i == $service->pageSize ? 'selected' : '') . '>' . $i . '</option>';
             }
             $html .= '</select> 条/页</div>' .
-                '<ul class="pagination">' ;
-            if($service->page > 1) {
+                '<ul class="pagination">';
+            if ($service->page > 1) {
                 $html .= '<li class="page-item">' .
                     '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '" aria-label="Previous">' .
                     '<span aria-hidden="true">&laquo;</span>' .
@@ -112,7 +112,7 @@ class BaseController extends Controller
                 $params['page'] = $i;
                 $html .= '<li class="page-item ' . ($service->page == $i ? 'active' : '') . '"><a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">' . $i . '</a></li>';
             }
-            if($service->page < $service->totalPage) {
+            if ($service->page < $service->totalPage) {
                 $params['page'] = $service->totalPage;
                 $html .= '<li class="page-item ' . ($service->page == $service->totalPage ? 'disabled' : '') . '">' .
                     '<a class="page-link" href="' . $this->createUrl($this->request->uri, $params) . '">末页</a></li>';

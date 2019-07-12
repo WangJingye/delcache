@@ -4,7 +4,7 @@ var toastr = {
         'successClass': 'alert-success',
         'errorClass': 'alert-danger',
     },
-    success: function (msg) {
+    success: function (msg, callback) {
         var alertC = 'alert' + toastr.count;
         toastr.count++;
         var html = '<div class="alert ' + toastr.option.successClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
@@ -20,6 +20,9 @@ var toastr = {
         popupContent.append(html);
         setTimeout(function () {
             $('.' + alertC).alert('close');
+            if (typeof callback == 'function') {
+                callback();
+            }
         }, 3000);
 
     },

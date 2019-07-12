@@ -12,7 +12,6 @@ class Db
     private $fields = '*';
     private $limit = '';
     private $order = '';
-
     private static $instance;
 
     /**
@@ -30,7 +29,6 @@ class Db
         }
         if (is_null($this->db)) {
             $this->db = new \PDO("mysql:host={$database['hostname']};dbname={$database['database']};port={$database['port']}", $database['username'], $database['password']);
-            $this->db->setAttribute(\PDO::ATTR_PERSISTENT , false);
             $this->db->query("SET NAMES " . $database['charset']);
         }
         $this->database = $database;
@@ -233,6 +231,12 @@ class Db
      */
     public function update($data)
     {
+        if (!isset($data['update_time'])) {
+            $fields = $this->getFields();
+            if (in_array('update_time', $fields)) {
+                $data['update_time'] = time();
+            }
+        }
         $sql = $this->array2sql($this->table_name, $data, 'update', $this->condition);
         $this->db->exec($sql);
     }
@@ -243,6 +247,12 @@ class Db
      */
     public function insert($data)
     {
+        if (!isset($data['create_time'])) {
+            $fields = $this->getFields();
+            if (in_array('create_time', $fields)) {
+                $data['create_time'] = time();
+            }
+        }
         $sql = $this->array2sql($this->table_name, $data);
         $this->db->exec($sql);
         return $this->db->lastInsertId();
@@ -250,11 +260,21 @@ class Db
 
     /**
      * @param array $data
-     * @return string
      * @throws \Exception
      */
     public function multiInsert($list)
     {
+        if (!count($list)) {
+            return;
+        }
+        if (!isset($list[0]['create_time'])) {
+            $fields = $this->getFields();
+            if (in_array('create_time', $fields)) {
+                foreach ($list as $k => $data) {
+                    $list[$k]['create_time'] = time();
+                }
+            }
+        }
         $dataSql = [];
         foreach ($list as $data) {
             foreach ($data as $k => $v) {
@@ -290,6 +310,13 @@ class Db
             $error = $this->db->errorInfo();
             throw new \Exception($error[2]);
         }
+    }
+
+    protected function getFields()
+    {
+        $sql = 'show columns  from ' . $this->table_name;
+        $fields = $this->findAll($sql);
+        return array_column($fields, 'Field');
     }
 
     /**

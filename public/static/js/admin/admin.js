@@ -37,6 +37,23 @@ $(function () {
         }
     });
 
+    $('.set-status-btn').click(function () {
+        let args = {
+            id: $(this).data('id'),
+            status: $(this).data('status')
+        };
+        toastr.loading('show');
+        $.post('/system/admin/setStatus', args, function (res) {
+            toastr.loading('hide');
+            if (res.errno == 0) {
+                toastr.success(res.message, function () {
+                    location.reload();
+                });
+            } else {
+                toastr.error(res.message);
+            }
+        }, 'json');
+    });
 });
 
 function saveForm() {

@@ -64,4 +64,21 @@ class AdminController extends BaseController
             $this->assign('model', $model);
         }
     }
+
+    /**　
+     * 账号启用\禁用
+     * @throws \Exception
+     */
+    public function setStatus()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            try {
+                $data = $this->request->params;
+                Db::table('Admin')->where(['admin_id' => $data['id']])->update(['status' => $data['status']]);
+                $this->success('修改成功');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }
 }
