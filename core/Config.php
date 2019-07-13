@@ -11,6 +11,17 @@ class Config
     {
         $file = COMMON_PATH . 'config/config.php';
         self::load($file);
+        $config = self::$config[APP];
+        if (!$config['default_module']) {
+            $config['default_module'] = 'admin';
+        }
+        if (!$config['default_action']) {
+            $config['default_action'] = 'index';
+        }
+        if (!$config['default_controller']) {
+            $config['default_controller'] = 'index';
+        }
+        self::$config = $config;
     }
 
     /**
@@ -39,15 +50,6 @@ class Config
 
         if (is_file($file)) {
             $config = include $file;
-            if (!$config['default_module']) {
-                $config['default_module'] = 'admin';
-            }
-            if (!$config['default_action']) {
-                $config['default_action'] = 'index';
-            }
-            if (!$config['default_controller']) {
-                $config['default_controller'] = 'index';
-            }
             self::$config = array_merge(self::$config, $config);
         }
         return self::$config;

@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/static/css/login.css">
 <div class="container">
+    <div class="login-head"><h3>后台管理系统</h3></div>
     <div class="login-box">
         <div class="login-title">用户登录</div>
         <form id="login-form" action="<?= $this->createUrl('system/public/login') ?>" method="post">

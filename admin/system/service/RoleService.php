@@ -55,9 +55,6 @@ class RoleService extends BaseService
         if (isset($data['id']) && $data['id']) {
             Db::table('Role')->where(['id' => $data['id']])->update($data);
         } else {
-            if (isset($data['id'])) {
-                unset($data['id']);
-            }
             Db::table('Role')->insert($data);
         }
     }

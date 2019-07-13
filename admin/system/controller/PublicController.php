@@ -38,7 +38,7 @@ class PublicController extends BaseController
                 }
                 $user['last_login_time'] = time();
                 Db::table('Admin')->where(['admin_id' => $user['admin_id']])->update($user);
-                Util::session_set('user', $user, 3600);
+                Util::session_set('user', $user, 24 * 3600);
                 $this->success('登录成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());

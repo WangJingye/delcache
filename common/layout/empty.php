@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,maximum-scale=1.0, initial-scale=1">
+    <meta name="viewport" content="width=device-width,maximum-scale=1.0, initial-scale=1, user-scalable=0">
     <title>后台管理系统</title>
     <?php foreach ($this->cssList as $css): ?>
         <link rel="stylesheet" href="<?= $css ?>">

@@ -7,6 +7,7 @@
  */
 
 namespace core;
+
 class Util
 {
     public static function session_set($name, $value = null, $expire = null)

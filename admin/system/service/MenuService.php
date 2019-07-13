@@ -246,9 +246,6 @@ class MenuService extends BaseService
         if (isset($data['id']) && $data['id']) {
             Db::table('Menu')->where(['id' => $data['id']])->update($data);
         } else {
-            if (isset($data['id'])) {
-                unset($data['id']);
-            }
             Db::table('Menu')->insert($data);
         }
     }

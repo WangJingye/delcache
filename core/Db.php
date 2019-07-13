@@ -12,6 +12,8 @@ class Db
     private $fields = '*';
     private $limit = '';
     private $order = '';
+    private $rename = '';
+    private $join = [];
     private static $instance;
 
     /**
@@ -34,6 +36,12 @@ class Db
         $this->database = $database;
     }
 
+    public function rename($as)
+    {
+        $this->rename = $as;
+        return $this;
+    }
+
     /**
      * @param array $database
      * @return Db
@@ -44,6 +52,7 @@ class Db
         if (is_null(self::$instance)) {
             self::$instance = new static($database);
         }
+        self::$instance->clear();
         return self::$instance;
     }
 
@@ -55,7 +64,6 @@ class Db
     public static function table($table)
     {
         $instance = Db::instance();
-        $instance->clear();
         $table = $instance->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', $table), '_');
         $instance->table_name = strtolower($table);
         return $instance;
@@ -83,6 +91,14 @@ class Db
             $field = $this->fields;
         }
         $sql = 'select ' . $field . ' from ' . $this->table_name;
+        if ($this->rename) {
+            $sql .= ' as ' . $this->rename;
+        }
+        if (count($this->join)) {
+            foreach ($this->join as $v) {
+                $sql .= ' ' . $v['join_type'] . ' join ' . $v['table_name'] . ' as ' . $v['as'] . ' on ' . $v['on'];
+            }
+        }
         if ($this->condition) {
             $sql .= ' where ' . $this->condition;
         }
@@ -122,6 +138,10 @@ class Db
      */
     public function find($sql = '')
     {
+        if (is_array($sql)) {
+            echo $this->getSql();
+            die;
+        }
         if (!$sql) {
             $sql = $this->getSql();
         }
@@ -184,7 +204,28 @@ class Db
         if (is_array($conditions)) {
             $fields = [];
             foreach ($conditions as $key => $value) {
-                $fields[] = '`' . $key . '`="' . str_replace('"', '\\"', str_replace('\\', '\\\\', $value)) . '"';
+                $k = $key;
+                //没有别名
+                if (strpos($key, '.') === false) {
+                    $k = '`' . $key . '`';
+                }
+                $symbol = '=';
+                $flag = 0;
+                $v = $value;
+                //value 为数组时,第一个为符号，第二个为值
+                if (is_array($value)) {
+                    $symbol = $value[0];
+                    $v = $value[1];
+                    //值为数组时，以逗号拼接成字符串
+                    if (is_array($value[1])) {
+                        $flag = 1;
+                        $v = '("' . implode('","', $value[1]) . '")';
+                    }
+                }
+                if ($flag == 0) {
+                    $v = '"' . str_replace('"', '\\"', str_replace('\\', '\\\\', $v)) . '"';
+                }
+                $fields[] = $k . ' ' . $symbol . ' ' . $v;
             }
             if (count($fields)) {
                 if ($this->condition) {
@@ -233,7 +274,7 @@ class Db
     {
         if (!isset($data['update_time'])) {
             $fields = $this->getFields();
-            if (in_array('update_time', $fields)) {
+            if (isset($fields['update_time'])) {
                 $data['update_time'] = time();
             }
         }
@@ -247,10 +288,19 @@ class Db
      */
     public function insert($data)
     {
-        if (!isset($data['create_time'])) {
-            $fields = $this->getFields();
-            if (in_array('create_time', $fields)) {
-                $data['create_time'] = time();
+        $fields = $this->getFields();
+        //自动添加创建时间
+        if (!isset($data['create_time']) && isset($fields['create_time'])) {
+            $data['create_time'] = time();
+        }
+        //未指定主键值时，主键字段不插入
+        foreach ($fields as $field => $v) {
+            //主键
+            if ($v['Key'] == 'PRI') {
+                if (isset($data[$field]) && $data[$field] == '') {
+                    unset($data[$field]);
+                }
+                break;
             }
         }
         $sql = $this->array2sql($this->table_name, $data);
@@ -267,12 +317,23 @@ class Db
         if (!count($list)) {
             return;
         }
-        if (!isset($list[0]['create_time'])) {
-            $fields = $this->getFields();
-            if (in_array('create_time', $fields)) {
-                foreach ($list as $k => $data) {
-                    $list[$k]['create_time'] = time();
+        $fields = $this->getFields();
+        //自动添加创建时间
+        if (!isset($list[0]['create_time']) && isset($fields['create_time'])) {
+            foreach ($list as $k => $data) {
+                $list[$k]['create_time'] = time();
+            }
+        }
+        //未指定主键值时，主键字段不插入
+        foreach ($fields as $field => $v) {
+            //主键
+            if ($v['Key'] == 'PRI') {
+                foreach ($list as $f => $data) {
+                    if (isset($data[$field]) && $data[$field] == '') {
+                        unset($list[$f][$field]);
+                    }
                 }
+                break;
             }
         }
         $dataSql = [];
@@ -314,9 +375,38 @@ class Db
 
     protected function getFields()
     {
-        $sql = 'show columns  from ' . $this->table_name;
+        $sql = 'show columns from ' . $this->table_name;
         $fields = $this->findAll($sql);
-        return array_column($fields, 'Field');
+        return array_column($fields, null, 'Field');
+    }
+
+
+    /**
+     * @param array|string|mixed $name
+     * @param $on
+     * @param string $join_type
+     * @return $this
+     */
+    public function join($name, $on, $join_type = 'left')
+    {
+        $as = '';
+        if (is_array($name)) {
+            $table = $this->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', array_values($name)[0]), '_');
+            //如果未设置key
+            if (array_keys($name)[0] != '0') {
+                $as = array_keys($name)[0];
+            }
+        } else {
+            $table = $this->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', $name), '_');
+        }
+        $table = strtolower($table);
+        $this->join[] = [
+            'table_name' => $table,
+            'as' => $as == '' ? $table : $as,
+            'on' => $on,
+            'join_type' => $join_type,
+        ];
+        return $this;
     }
 
     /**
@@ -349,12 +439,14 @@ class Db
         return $sql;
     }
 
+
     protected function clear()
     {
         $this->condition = '';
         $this->fields = '*';
         $this->limit = '';
         $this->order = '';
+        $this->join = [];
     }
 
 }

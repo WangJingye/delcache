@@ -57,9 +57,6 @@ class AdminService extends BaseService
         if (isset($data['admin_id']) && $data['admin_id']) {
             Db::table('Admin')->where(['admin_id' => $data['admin_id']])->update($data);
         } else {
-            if (isset($data['admin_id'])) {
-                unset($data['admin_id']);
-            }
             $data['salt'] = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
             $password = Config::get('default-password');
             $data['password'] = Encrypt::encryptPassword($password == '' ? '123456' : $password, $data['salt']);

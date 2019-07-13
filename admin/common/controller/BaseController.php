@@ -176,14 +176,11 @@ class BaseController extends Controller
             if ($this->user['identity'] == 1) {
                 return;
             }
-            $roleMenus = Db::table('RoleMenu')->where(['menu_id' => $menu['id']])->findAll();
-            if (!count($roleMenus)) {
-                throw new \Exception('您暂无该权限');
-            }
-            $roleAdmin = Db::table('RoleAdmin')->where(['admin_id' => $this->user['admin_id']])
-                ->where('role_id in (' . implode(',', array_column($roleMenus, 'role_id')) . ')')
+            $access = Db::table('RoleMenu')->rename('a')
+                ->join(['b' => 'RoleAdmin'], 'a.role_id = b.role_id')
+                ->where(['a.menu_id' => $menu['id'], 'b.admin_id' => $this->user['admin_id']])
                 ->find();
-            if (!$roleAdmin) {
+            if (!$access) {
                 throw new \Exception('您暂无该权限');
             }
         } catch (\Exception $e) {

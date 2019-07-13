@@ -190,7 +190,7 @@
     margin-top: 1rem;
     border-left: 1px;
     border-right: 1px;
-    border-top:1px;
+    border-top: 1px;
     border-bottom: 0;
     border-style: solid;
     border-color: #dee2e6;
@@ -294,3 +294,8 @@ h3 {
     width: 80px;
     height: 80px;
 }
+
+.bd-container{
+    padding: 1rem;
+}
+

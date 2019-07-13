@@ -21,6 +21,7 @@ class Request
     public $defaultUri;
 
     public static $instance;
+
     /**
      * Db constructor.
      * @param array $config
@@ -34,7 +35,8 @@ class Request
     /**
      * @throws \Exception
      */
-    public function parseParams(){
+    public function parseParams()
+    {
         $res = $this->parseUri(isset($_GET['s']) ? $_GET['s'] : '');
         $this->module = $res['module'];
         $this->action = $res['action'];
