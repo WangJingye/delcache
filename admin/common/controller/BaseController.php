@@ -163,13 +163,16 @@ class BaseController extends Controller
     {
         try {
             $uri = $this->request->uri;
-            $menu = Db::table('Menu')->where(['url' => $uri])->find();
-            if ($this->checkWhiteList($this->request->module . '/' . $this->request->controller, $this->request->action)) {
+            if ($this->checkNoLoginList($this->request->module . '/' . $this->request->controller, $this->request->action)) {
                 return;
             }
             if (empty($this->user)) {
                 throw new \Exception('您暂未登陆', 1111);
             }
+            if ($this->checkWhiteList($this->request->module . '/' . $this->request->controller, $this->request->action)) {
+                return;
+            }
+            $menu = Db::table('Menu')->where(['url' => $uri])->find();
             if (!$menu) {
                 throw new \Exception($uri . '该地址不在权限中');
             }
@@ -211,14 +214,38 @@ class BaseController extends Controller
      * @return bool
      * @throws \Exception
      */
-    public function checkWhiteList($moduleName, $actionName = null)
+    public function checkNoLoginList($moduleName, $actionName = null)
     {
-        $action = Config::get('actionWhiteList');
+        $noLoginActions = Config::get('actionNoLoginList');
 
         $moduleName = strtolower($moduleName);
         $actionName = strtolower($actionName);
         $_deal_action = [];
-        foreach ($action as $m => $a) {
+        foreach ($noLoginActions as $m => $a) {
+            array_walk($a, function (&$x) {
+                $x = strtolower($x);
+            });
+            $_deal_action[strtolower($m)] = $a;
+        }
+        if (isset($_deal_action[$moduleName]) && in_array($actionName, $_deal_action[$moduleName])) {
+            return true;
+        }
+        return false;
+    }
+
+    /* @param $moduleName
+     * @param null $actionName
+     * @return bool
+     * @throws \Exception
+     */
+    public function checkWhiteList($moduleName, $actionName = null)
+    {
+        $noLoginActions = Config::get('actionWhiteList');
+
+        $moduleName = strtolower($moduleName);
+        $actionName = strtolower($actionName);
+        $_deal_action = [];
+        foreach ($noLoginActions as $m => $a) {
             array_walk($a, function (&$x) {
                 $x = strtolower($x);
             });
@@ -261,7 +288,7 @@ class BaseController extends Controller
         if (!$view || !file_exists($view)) {
             throw new \Exception('view is missing!', 500);
         }
-        include COMMON_PATH . 'layout/' . $this->layout . '.php';
+        include APP_PATH . 'common/layout/' . $this->layout . '.php';
         exit();
     }
 

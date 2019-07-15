@@ -8,8 +8,7 @@
         <link rel="stylesheet" href="<?= $css ?>">
     <?php endforeach; ?>
 </head>
-<body>
-
+<body style="background-color: #f7f7f9;">
 <header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar">
     <div class="col-3 col-md-3 col-xl-2">
         <ul class="navbar-nav">
@@ -20,6 +19,7 @@
                     <span><?= $this->user['realname'] ?></span>
                 </a>
                 <div class="dropdown-menu" style="position: absolute">
+                    <a class="dropdown-item" href="<?= $this->createUrl('system/admin/profile') ?>">个人信息</a>
                     <a class="dropdown-item" href="<?= $this->createUrl('system/public/logout') ?>">登出</a>
                 </div>
             </li>
@@ -63,12 +63,18 @@
     </div>
     <div class="col-12 col-md-9 col-xl-10 bd-content" style="padding: 0">
         <nav>
-            <ol class="breadcrumb" style="border-radius: 0;">
+            <ol class="breadcrumb" style="border-radius: 0;margin-bottom: 0;">
                 <li class="breadcrumb-item"><a href="/"><i class="glyphicon glyphicon-home"></i> 主页</a></li>
-                <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['topList'][$this->menus['active']['topId']]['url']) ?>"><?= $this->menus['topList'][$this->menus['active']['topId']]['name'] ?></a></li>
-                <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['url']) ?>"><?= $this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['name'] ?></a></li>
+                <li class="breadcrumb-item"><a
+                            href="<?= $this->createUrl($this->menus['topList'][$this->menus['active']['topId']]['url']) ?>"><?= $this->menus['topList'][$this->menus['active']['topId']]['name'] ?></a>
+                </li>
+                <li class="breadcrumb-item"><a
+                            href="<?= $this->createUrl($this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['url']) ?>"><?= $this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['name'] ?></a>
+                </li>
                 <?php if (isset($this->menus['active']['endId'])): ?>
-                    <li class="breadcrumb-item"><a href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['childId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></a></li>
+                    <li class="breadcrumb-item"><a
+                                href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['childId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></a>
+                    </li>
                     <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['endId']]['name'] ?></li>
                 <?php else: ?>
                     <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></li>

@@ -4,7 +4,10 @@ var toastr = {
         'successClass': 'alert-success',
         'errorClass': 'alert-danger',
     },
-    success: function (msg, callback) {
+    success: function (msg, callback, timeout) {
+        if (timeout == null) {
+            timeout = 3000;
+        }
         var alertC = 'alert' + toastr.count;
         toastr.count++;
         var html = '<div class="alert ' + toastr.option.successClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
@@ -23,10 +26,13 @@ var toastr = {
             if (typeof callback == 'function') {
                 callback();
             }
-        }, 3000);
+        }, timeout);
 
     },
-    error: function (msg) {
+    error: function (msg, callback, timeout) {
+        if (timeout == null) {
+            timeout = 3000;
+        }
         var alertC = 'alert' + toastr.count;
         toastr.count++;
         var html = '<div class="alert ' + toastr.option.errorClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
@@ -42,7 +48,10 @@ var toastr = {
         popupContent.append(html);
         setTimeout(function () {
             $('.' + alertC).alert('close');
-        }, 3000);
+            if (typeof callback == 'function') {
+                callback();
+            }
+        }, timeout);
     },
     loading: function (type, msg) {
         if (type == null) {

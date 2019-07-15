@@ -5,8 +5,11 @@ if (file_exists(COMMON_PATH . 'config/config.php')) {
     $runtimeConfig = [];
 }
 $configs = [
+    'actionNoLoginList' => [
+        'system/public' => ['login', 'logout', 'captcha'],
+    ],
     'actionWhiteList' => [
-        'system/public' => ['login', 'logout', 'captcha', 'error'],
+        'system/admin' => ['profile','changePassword','changeProfile']
     ]
 ];
 return array_merge($runtimeConfig, $configs);

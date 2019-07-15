@@ -6,6 +6,7 @@ namespace admin\system\controller;
 use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
 use core\Db;
+use core\Util;
 
 class AdminController extends BaseController
 {
@@ -75,6 +76,48 @@ class AdminController extends BaseController
             try {
                 $data = $this->request->params;
                 Db::table('Admin')->where(['admin_id' => $data['id']])->update(['status' => $data['status']]);
+                $this->success('修改成功');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }
+
+    public function profile()
+    {
+
+    }
+
+    public function changePassword()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            try {
+                $params = $this->request->params;
+                $this->adminService->changePassword($this->user, $params);
+                $this->success('修改成功');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }
+
+    public function changeProfile()
+    {
+        if ($this->request->isAjax() && $this->request->isPost()) {
+            try {
+                $params = $this->request->params;
+                if (!empty($_FILES['file'])) {
+                    $file = $_FILES['file'];
+                    $params['avatar'] = $this->parseFile($file);
+                }
+                $user = $this->user;
+                $params['admin_id'] = $user['admin_id'];
+                $params['username'] = $user['username'];
+                $this->adminService->saveAdmin($params);
+                foreach ($params as $k => $v) {
+                    $user[$k] = $v;
+                }
+                Util::session_set('user', $user);
                 $this->success('修改成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());

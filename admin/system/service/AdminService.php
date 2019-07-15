@@ -13,6 +13,7 @@ use admin\common\service\BaseService;
 use common\extend\encrypt\Encrypt;
 use core\Config;
 use core\Db;
+use core\Util;
 
 class AdminService extends BaseService
 {
@@ -62,5 +63,24 @@ class AdminService extends BaseService
             $data['password'] = Encrypt::encryptPassword($password == '' ? '123456' : $password, $data['salt']);
             Db::table('Admin')->insert($data);
         }
+    }
+
+    /**
+     * @param $admin
+     * @param $data
+     * @throws \Exception
+     */
+    public function changePassword($admin, $data)
+    {
+        if ($admin['password'] != Encrypt::encryptPassword($data['password'], $admin['salt'])) {
+            throw new \Exception('当前登录密码有误～');
+        }
+        if ($data['newPassword'] != $data['rePassword']) {
+            throw new \Exception('新密码与验证密码不一致～');
+        }
+        $update['salt'] = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+        $update['password'] = Encrypt::encryptPassword($data['newPassword'], $update['salt']);
+        Db::table('Admin')->where(['admin_id' => $admin['admin_id']])->update($update);
+        Util::session_unset('user');
     }
 }

@@ -137,6 +137,7 @@
 }
 
 .search-form {
+    background-color: #fff;
     padding: .5rem;
     border-left: 1px;
     border-right: 1px;
@@ -187,6 +188,7 @@
 }
 
 .btn-box {
+    background-color: #fff;
     margin-top: 1rem;
     border-left: 1px;
     border-right: 1px;
@@ -213,6 +215,7 @@ h3 {
 
 .list-table {
     margin-bottom: 0;
+    background-color: #fff;
 }
 
 .list-table .list-table-nodata {
@@ -221,6 +224,7 @@ h3 {
 }
 
 .pagination-list {
+    background-color: #fff;
     margin-bottom: 1rem;
     border-left: 1px;
     border-right: 1px;
@@ -299,3 +303,15 @@ h3 {
     padding: 1rem;
 }
 
+.bd-tab-content{
+    border: 1px solid;
+    border-color: #fff #dee2e6 #dee2e6 #dee2e6;
+    background: #fff;
+}
+
+.form-box{
+    padding: 1rem;
+}
+.form-box .form-label{
+    text-align: right;
+}
