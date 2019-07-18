@@ -1,8 +1,7 @@
 <?php $symbolClass = [
     0 => '<span style="color:#e95d4e"><i class="glyphicon glyphicon-remove"></i></span> ',
     1 => '<span style="color:#1dccaa"><i class="glyphicon glyphicon-ok"></i></span> '
-];
-?>
+]; ?>
 <table class="table install-check-table">
     <tbody>
     <tr class="install-table-header">
