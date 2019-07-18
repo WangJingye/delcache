@@ -313,5 +313,10 @@ h3 {
     padding: 1rem;
 }
 .form-box .form-label{
-    text-align: right;
+    text-align: center;
+}
+@media(min-width: 576px){
+    .form-box .form-label{
+        text-align: right;
+    }
 }

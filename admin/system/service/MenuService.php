@@ -177,7 +177,17 @@ class MenuService extends BaseService
      */
     public function getAllMethodList($menu_id = 0)
     {
-        $list = get_declared_classes();
+        $arr[] = Config::get('actionNoLoginList');
+        $arr[] = Config::get('actionWhiteList');
+        $actionList = [];
+        foreach ($arr as $ar) {
+            foreach ($ar as $controller => $actions) {
+                foreach ($actions as $action) {
+                    $actionList[] = strtolower($controller . '/' .$action);
+                }
+            }
+        }
+        $actionList = array_values(array_unique($actionList));
         $baseMethodList = get_class_methods('admin\common\controller\BaseController');
         $existMethodList = Db::table('Menu')->field(['url', 'id'])->where('url != ""')->findAll();
         $existMethodList = array_column($existMethodList, 'url', 'id');
@@ -200,26 +210,10 @@ class MenuService extends BaseService
                         continue;
                     }
                     $uri = $module . '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . $method;
-                    if ($uri == $currentMethod || !in_array($uri, $existMethodList)) {
+                    if (($uri == $currentMethod || !in_array($uri, $existMethodList)) && !in_array(strtolower($uri) , $actionList)) {
                         $uriList[] = $uri;
                     }
                 }
-            }
-        }
-        foreach ($list as $v) {
-            $arr = explode('\\', $v);
-            //不是Controller的命名空间格式
-            if (count($arr) != 4 || $arr[0] != 'admin' || $arr[2] != 'controller' || (strpos($arr[3], 'Controller') !== false && strpos($arr[3], 'Controller') !== strlen($arr[3]) - 10)) {
-                continue;
-            }
-            $methodList = get_class_methods($v);
-            $methodList = array_diff($methodList, $baseMethodList);
-            foreach ($methodList as $method) {
-                $uri = $arr[1] . '/' . strtolower(str_replace('Controller', '', $arr[3])) . '/' . $method;
-                if ($uri == $currentMethod || !in_array($uri, $existMethodList)) {
-                    $uriList[] = $uri;
-                }
-
             }
         }
         return $uriList;

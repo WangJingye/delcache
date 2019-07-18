@@ -28,6 +28,9 @@ class AdminService extends BaseService
         if (isset($params['status']) && $params['status'] != '') {
             $selector->where(['status' => $params['status']]);
         }
+        if (isset($params['admin_id']) && $params['admin_id'] != '') {
+            $selector->where(['admin_id' => $params['admin_id']]);
+        }
         if (isset($params['username']) && $params['username'] != '') {
             $selector->where('username like "%' . $params['username'] . '%"');
         }

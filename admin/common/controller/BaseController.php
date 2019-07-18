@@ -50,10 +50,15 @@ class BaseController extends Controller
      */
     public function init()
     {
-        $user = Util::session_get('user');
-        $this->user = $user ? $user : [];
-        $this->validateUserGrant();
-        $this->setMenu();
+        if (!IS_INSTALL && $this->request->module != 'install') {
+            $this->redirect('install/index/agreement');
+        }
+        if (IS_INSTALL) {
+            $user = Util::session_get('user');
+            $this->user = $user ? $user : [];
+            $this->validateUserGrant();
+            $this->setMenu();
+        }
         parent::init();
     }
 
@@ -362,6 +367,16 @@ class BaseController extends Controller
         }
         if (!in_array($script, $this->scriptList)) {
             $this->scriptList[] = $script;
+        }
+        return $this;
+    }
+    public function appendCss($css)
+    {
+        if (strpos($css, '/') !== 0) {
+            $css = '/static/' . $css;
+        }
+        if (!in_array($css, $this->cssList)) {
+            $this->cssList[] = $css;
         }
         return $this;
     }

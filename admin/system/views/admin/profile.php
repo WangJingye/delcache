@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <div class="col-12 offset-4 col-sm-8">
+                <div class="offset-4 col-sm-8 text-nowrap">
                     <button class="btn btn-primary" type="submit">保存</button>
                 </div>
             </div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="form-group row">
-                <div class="col-12 offset-4 col-sm-8">
+                <div class="offset-4 col-sm-8 text-nowrap">
                     <button class="btn btn-primary" type="submit">保存</button>
                 </div>
             </div>

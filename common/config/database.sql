@@ -1,7 +1,11 @@
-# ************************************************************
-# Database: base
-# Generation Time: 2019-07-05 02:21:50 +0000
-# ************************************************************
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
 
 # Dump of table tbl_admin
 # ------------------------------------------------------------
@@ -27,17 +31,6 @@ CREATE TABLE `tbl_admin` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户表';
 
-LOCK TABLES `tbl_admin` WRITE;
-/*!40000 ALTER TABLE `tbl_admin` DISABLE KEYS */;
-
-INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`, `realname`, `mobile`, `email`, `avatar`, `salt`, `identity`, `last_login_time`, `passwd_modify_time`, `create_time`, `update_time`, `status`)
-VALUES
-	(1,'administrator','0629af20c616bedf91fc8f7615a6aeea','超级管理员','13646622759','wangjingye646@163.com','/upload/system/image/a72db967f87cf53194aefafc77f1cc1a.png','8391',0,1562293268,0,0,0,1);
-
-/*!40000 ALTER TABLE `tbl_admin` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
 # Dump of table tbl_menu
 # ------------------------------------------------------------
 
@@ -46,8 +39,8 @@ DROP TABLE IF EXISTS `tbl_menu`;
 CREATE TABLE `tbl_menu` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
   `name` varchar(50) NOT NULL DEFAULT '' COMMENT '菜单名称',
-  `url` varchar(200) DEFAULT NULL COMMENT '菜单文件路径',
-  `desc` varchar(255) DEFAULT NULL COMMENT '菜单描述',
+  `url` varchar(200) DEFAULT '' COMMENT '菜单文件路径',
+  `desc` varchar(255) DEFAULT '' COMMENT '菜单描述',
   `parent_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '父级菜单ID',
   `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '显示类型(0:导航,1:菜单,2:功能)',
   `icon` varchar(255) NOT NULL DEFAULT '' COMMENT '菜单icon样式',
@@ -64,18 +57,21 @@ LOCK TABLES `tbl_menu` WRITE;
 
 INSERT INTO `tbl_menu` (`id`, `name`, `url`, `desc`, `parent_id`, `type`, `icon`, `sort`, `status`, `create_time`, `update_time`)
 VALUES
-	(1,'系统管理','','',0,0,'glyphicon glyphicon-cog',10,1,1401160833,1404723369),
-	(2,'业务管理',NULL,'',0,0,'glyphicon glyphicon-briefcase',9,1,1401160847,1404723373),
-	(3,'菜单权限管理',NULL,NULL,1,1,'glyphicon glyphicon-list',0,1,0,0),
-	(4,'菜单列表','system/menu/index',NULL,3,2,'',0,1,0,0),
-	(5,'编辑菜单','system/menu/editMenu',NULL,4,3,'',0,1,0,0),
-	(6,'角色列表','system/role/index','',3,2,'',0,1,0,0),
-	(7,'编辑角色','system/role/editRole','',6,3,'',0,1,0,0),
-	(8,'设置角色权限','system/role/setRoleMenu','',6,3,'',0,1,0,0),
-	(9,'设置角色用户','system/role/setRoleAdmin','',6,3,'',0,1,0,0),
-	(10,'后台账号管理','','',1,1,'glyphicon glyphicon-user',0,1,0,0),
-	(11,'账号列表','system/admin/index','',10,2,'',0,1,0,0),
-	(12,'编辑账号','system/admin/editAdmin','',11,3,'',0,1,0,0);
+	(1,'系统管理','','root',0,0,'glyphicon glyphicon-cog',10,1,1562982765,1562982765),
+	(2,'业务管理','','',0,0,'glyphicon glyphicon-briefcase',9,1,1562982765,1562982765),
+	(3,'菜单权限管理','','',1,1,'glyphicon glyphicon-list',0,1,1562982765,1562982765),
+	(4,'菜单列表','system/menu/index','',3,2,'',0,1,1562982765,1562982765),
+	(5,'编辑菜单','system/menu/editMenu','',4,3,'',0,1,1562982765,1562982765),
+	(6,'角色列表','system/role/index','',3,2,'',0,1,1562982765,1562982765),
+	(7,'编辑角色','system/role/editRole','',6,3,'',0,1,1562982765,1562982765),
+	(8,'设置角色权限','system/role/setRoleMenu','',6,3,'',0,1,1562982765,1562982765),
+	(9,'设置角色用户','system/role/setRoleAdmin','',6,3,'',0,1,1562982765,1562982765),
+	(10,'后台账号管理','','',1,1,'glyphicon glyphicon-user',0,1,1562982765,1562982765),
+	(11,'账号列表','system/admin/index','',10,2,'',0,1,1562982765,1562982765),
+	(12,'编辑账号','system/admin/editAdmin','',11,3,'',0,1,1562982765,1562982765),
+	(13,'菜单启用/禁用','system/menu/setStatus','',4,3,'',0,1,1562982765,1562982765),
+	(14,'账号启用/禁用','system/admin/setStatus','',11,3,'',0,1,1562982765,1562982765),
+	(15,'个人信息','system/admin/profile','',11,3,'',0,1,1563005512,0);
 
 /*!40000 ALTER TABLE `tbl_menu` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -101,7 +97,7 @@ LOCK TABLES `tbl_role` WRITE;
 
 INSERT INTO `tbl_role` (`id`, `name`, `desc`, `status`, `create_time`, `update_time`)
 VALUES
-	(1,'超级管理员','root',1,0,0);
+	(1,'管理员','root',1,1562982778,1562982993);
 
 /*!40000 ALTER TABLE `tbl_role` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -120,16 +116,6 @@ CREATE TABLE `tbl_role_admin` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
-LOCK TABLES `tbl_role_admin` WRITE;
-/*!40000 ALTER TABLE `tbl_role_admin` DISABLE KEYS */;
-
-INSERT INTO `tbl_role_admin` (`id`, `admin_id`, `role_id`, `create_time`)
-VALUES
-	(1,1,1,1562048387),
-	(4,2,1,1562225570);
-
-/*!40000 ALTER TABLE `tbl_role_admin` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table tbl_role_menu
@@ -160,10 +146,21 @@ VALUES
 	(14,1,7,1562046879),
 	(15,1,8,1562046879),
 	(16,1,9,1562046879),
-	(20,1,10,1562226334),
-	(21,1,11,1562226334),
-	(22,1,12,1562226334);
+	(26,1,13,1562899469),
+	(28,1,10,1562989331),
+	(29,1,11,1562989331),
+	(30,1,12,1562989331),
+	(31,1,14,1563168355),
+	(32,1,15,1563168355);
 
 /*!40000 ALTER TABLE `tbl_role_menu` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

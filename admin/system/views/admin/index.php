@@ -14,7 +14,7 @@
             <option value="1" <?= $this->params['status'] == '1' ? 'selected' : '' ?>>可用</option>
         </select>
     </div>
-    <?php $searchList = ['user_id' => '用户ID', 'username' => '用户名', 'realname' => '真实姓名']; ?>
+    <?php $searchList = ['admin_id' => '用户ID', 'username' => '用户名', 'realname' => '真实姓名']; ?>
     <div class="form-content">
         <span class="col-form-label search-label">查询条件</span>
         <div class="clearfix" style="display: inline-flex;">
