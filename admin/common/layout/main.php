@@ -14,8 +14,9 @@
         <ul class="navbar-nav">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                    <img class="rounded-circle" src="<?= $this->user['avatar'] ?>"
-                         style="width:30px;height:30px">
+                    <?php if ($this->user['avatar']): ?>
+                        <img class="rounded-circle" src="<?= $this->user['avatar'] ?>" style="width:30px;height:30px">
+                    <?php endif; ?>
                     <span><?= $this->user['realname'] ?></span>
                 </a>
                 <div class="dropdown-menu" style="position: absolute">
