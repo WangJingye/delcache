@@ -1,17 +1,8 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/5/27
- * Time: 9:48 PM
- */
-
 namespace admin\system\service;
 
 use admin\common\service\BaseService;
-use core\Config;
-use core\Db;
 
 class MenuService extends BaseService
 {
@@ -23,7 +14,7 @@ class MenuService extends BaseService
      */
     public function getList($params, $ispage = true)
     {
-        $selector = Db::table('Menu');
+        $selector = \Db::table('Menu');
         if (isset($params['status']) && $params['status'] != '') {
             $selector->where(['status' => $params['status']]);
         }
@@ -39,108 +30,60 @@ class MenuService extends BaseService
         return $selector->findAll();
     }
 
-
     /**
      * @return array
      * @throws \Exception
      */
-    public function menus($adminId, $uri)
+    public function getTopList()
     {
-        $admin = Db::table('Admin')->where(['admin_id' => $adminId])->find();
-        $menuIdList = [];
-        if (!$admin) {
-            throw new \Exception('用户有误');
-        }
-
-        $roleIdList = Db::table('RoleAdmin')->field(['role_id'])->where(['admin_id' => $adminId])->findAll();
-        if (count($roleIdList)) {
-            $roleIdList = array_column($roleIdList, 'role_id');
-            $menuIdList = Db::table('RoleMenu')
-                ->field(['menu_id'])->where('role_id in (' . implode(',', $roleIdList) . ')')
-                ->findAll();
-            $menuIdList = array_column($menuIdList, 'menu_id');
-        }
-        $selector = Db::table('Menu')->where(['status' => 1]);
-        if ($admin['identity'] == 0) {
-            $selector->where('id in (' . implode(',', $menuIdList) . ')');
-        }
-        $menuList = $selector->order('sort desc')->findAll();
-        foreach ($menuList as $v) {
+        $rows = $this->getAdminMenus();
+        $topList = [];
+        foreach ($rows as $v) {
             if ($v['parent_id'] == 0) {
-                $topList[$v['id']] = $v;
-            }
-        }
-        $leftList = [];
-        $leftIds = [];
-        foreach ($menuList as $v) {
-            if (isset($topList[$v['parent_id']])) {
-                $leftList[$v['parent_id']][$v['id']] = $v;
-                $leftIds[] = $v['id'];
-            }
-        }
-
-        $childList = [];
-        $childIds = [];
-        foreach ($menuList as $v) {
-            if (in_array($v['parent_id'], $leftIds)) {
-                $childList[$v['parent_id']][] = $v;
-                $childIds[] = $v['id'];
-            }
-        }
-        $endList = [];
-        foreach ($menuList as $v) {
-            if (in_array($v['parent_id'], $childIds)) {
-                $endList[$v['id']] = $v['parent_id'];
-            }
-        }
-
-        //头部导航设置跳转链接
-        foreach ($topList as $topId => $v) {
-            if (isset($leftList[$v['id']])) {
-                foreach ($leftList[$v['id']] as $leftId => $x) {
-                    $arr = isset($childList[$leftId]) ? $childList[$leftId] : [];
-                    foreach ($arr as $y) {
-                        if ($topList[$topId]['url'] == '' && $y['url'] != '') {
-                            $topList[$topId]['url'] = $y['url'];
-                        }
-                        if ($leftList[$v['id']][$leftId]['url'] == '' && $y['url'] != '') {
-                            $leftList[$v['id']][$leftId]['url'] = $y['url'];
-                            break;
-                        }
+                $childList = $this->getChild($rows, $v['id']);
+                foreach ($childList as $child) {
+                    if ($child['url'] != '') {
+                        $v['url'] = $child['url'];
+                        $topList[] = $v;
+                        break;
                     }
                 }
             }
         }
-        $menuList = array_column($menuList, null, 'id');
+        return $topList;
+    }
 
-        $active = [];
-        foreach ($menuList as $id => $v) {
-            if (strtolower($uri) == strtolower($v['url'])) {
-                if (isset($endList[$v['id']])) {
-                    $active = [
-                        'childId' => $v['parent_id'],
-                        'leftId' => $menuList[$v['parent_id']]['parent_id'],
-                        'topId' => $menuList[$menuList[$v['parent_id']]['parent_id']]['parent_id'],
-                        'endId' => $v['id'],
-                    ];
-                } else {
-                    $active = [
-                        'childId' => $v['id'],
-                        'leftId' => $v['parent_id'],
-                        'topId' => $menuList[$v['parent_id']]['parent_id'],
-                    ];
-                }
+    /**
+     * @throws \Exception
+     */
+    public function getAdminMenus()
+    {
+        $selector = \Db::table('Menu')
+            ->where(['status' => 1]);
+        if (\App::$user['identity'] == 0) {
+            $roleMenus = \Db::table('RoleMenu')->rename('a')
+                ->join(['b' => 'RoleAdmin'], 'a.role_id = b.role_id')
+                ->field(['a.menu_id'])
+                ->where(['b.admin_id' => \App::$user['admin_id']])
+                ->findAll();
+            $roleMenus = array_column($roleMenus, 'menu_id');
+            $selector->where(['id' => ['in', $roleMenus]]);
+        }
+        return $selector->order('sort desc,create_time asc')
+            ->findAll();
+    }
 
+    public function getChild($rows, $id)
+    {
+        $childList = [];
+        foreach ($rows as $v) {
+            if ($v['parent_id'] == $id) {
+                $childList[] = $v;
+                $arr = $this->getChild($rows, $v['id']);
+                $childList = array_merge($childList, $arr);
             }
         }
-        return [
-            'topList' => $topList,
-            'leftList' => $leftList,
-            'childList' => $childList,
-            'endList' => $endList,
-            'menuList' => $menuList,
-            'active' => $active
-        ];
+        return $childList;
     }
 
     /**
@@ -156,7 +99,7 @@ class MenuService extends BaseService
         if ($parent_id == 0) {
             $types[] = ['id' => $parent_id, 'name' => '顶级目录'];
         }
-        $rows = Db::table('Menu')
+        $rows = \Db::table('Menu')
             ->where(['parent_id' => $parent_id])
             ->where(['status' => 1])
             ->order('sort desc,create_time asc')
@@ -175,42 +118,133 @@ class MenuService extends BaseService
      * @return array
      * @throws \Exception
      */
+    public function getLeftList()
+    {
+        $selector = \Db::table('Menu')
+            ->where(['status' => 1]);
+        if (\App::$user['identity'] == 0) {
+            $roleMenus = \Db::table('RoleMenu')->rename('a')
+                ->join(['b' => 'RoleAdmin'], 'a.role_id = b.role_id')
+                ->field(['a.menu_id'])
+                ->where(['b.admin_id' => \App::$user['admin_id']])
+                ->findAll();
+            $roleMenus = array_column($roleMenus, 'menu_id');
+            $selector->where(['id' => ['in', $roleMenus]]);
+        }
+        $menuList = $this->getAdminMenus();
+        $activeList = $this->getActiveMenu();
+        $topList = [];
+        $leftList = [];
+        foreach ($menuList as $v) {
+            if ($v['parent_id'] == 0) {
+                if (isset($activeList[$v['id']])) {
+                    $top = $v;
+                }
+                $topList[] = $v;
+            }
+        }
+        foreach ($menuList as $v) {
+            if ($v['parent_id'] == $top['id']) {
+                $leftList[$v['id']]['item'] = $v;
+                $leftList[$v['id']]['list'] = [];
+            }
+        }
+        foreach ($menuList as $v) {
+            if (isset($leftList[$v['parent_id']])) {
+                $leftList[$v['parent_id']]['list'][] = $v;
+            }
+        }
+        return $leftList;
+    }
+
+    /**
+     * @param $cmenu
+     * @param $menuList
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getParent($cmenu, $menuList)
+    {
+        $menuList[$cmenu['id']] = $cmenu;
+        if ($cmenu['parent_id'] == 0) {
+            return $menuList;
+        }
+        $menu = \Db::table('Menu')->where(['id' => $cmenu['parent_id']])->find();
+        return $this->getParent($menu, $menuList);
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getCurrentMenu()
+    {
+        return \Db::table('Menu')->where(['url' => \App::$request->uri])->find();
+    }
+
+    /**
+     * @return array|mixed
+     * @throws \Exception
+     */
+    public function getActiveMenu()
+    {
+        $menu = $this->getCurrentMenu();
+        $activeList = [];
+        if ($menu) {
+            $activeList = $this->getParent($menu, []);
+        }
+        return $activeList;
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
     public function getAllMethodList($menu_id = 0)
     {
-        $arr[] = Config::get('actionNoLoginList');
-        $arr[] = Config::get('actionWhiteList');
+        $arr[] = \App::$config->actionNoLoginList;
+        $arr[] = \App::$config->actionWhiteList;
         $actionList = [];
         foreach ($arr as $ar) {
             foreach ($ar as $controller => $actions) {
                 foreach ($actions as $action) {
-                    $actionList[] = strtolower($controller . '/' .$action);
+                    $actionList[] = strtolower($controller . '/' . $action);
                 }
             }
         }
         $actionList = array_values(array_unique($actionList));
-        $baseMethodList = get_class_methods('admin\common\controller\BaseController');
-        $existMethodList = Db::table('Menu')->field(['url', 'id'])->where('url != ""')->findAll();
+        $existMethodList = \Db::table('Menu')->field(['url', 'id'])->where('url != ""')->findAll();
         $existMethodList = array_column($existMethodList, 'url', 'id');
         $currentMethod = isset($existMethodList[$menu_id]) ? $existMethodList[$menu_id] : '';
         $uriList = [];
-        foreach (Config::get('module_list') as $module) {
-            $list = scandir(APP_PATH . $module . '/controller/');
+        $moduleList = scandir(APP_PATH);
+        $excludeModuleList = ['.', '..', 'install'];
+        foreach ($moduleList as $module) {
+            if (in_array($module, $excludeModuleList)) {
+                continue;
+            }
+            if (!file_exists(APP_PATH . $module . '/controller')) {
+                continue;
+            }
+            $list = scandir(APP_PATH . $module . '/controller');
             foreach ($list as $v) {
                 if ($v == '.' || $v == '..') {
                     continue;
                 }
-                $controller = str_replace('.php', '', $v);
-                if ($controller == 'BaseController') {
+                if(strpos($v,'Controller')===false){
                     continue;
                 }
-                $v = 'admin\\' . $module . '\\controller\\' . str_replace('.php', '', $v);
+                $controller = str_replace('.php', '', $v);
+                $v = 'admin\\' . $module . '\\controller\\' . substr($v, 0, -4);
                 $methodList = get_class_methods($v);
                 foreach ($methodList as $method) {
-                    if (in_array($method, $baseMethodList)) {
+                    if(strpos($method,'Action')===false){
                         continue;
                     }
-                    $uri = $module . '/' . strtolower(str_replace('Controller', '', $controller)) . '/' . $method;
-                    if (($uri == $currentMethod || !in_array($uri, $existMethodList)) && !in_array(strtolower($uri) , $actionList)) {
+                    $c = strtolower(trim(preg_replace('/([A-Z])/', '-$1', substr($controller, 0, -10)), '-'));
+                    $a = strtolower(trim(preg_replace('/([A-Z])/', '-$1', substr($method, 0, -6)), '-'));
+                    $uri = $module . '/' . $c . '/' . $a;
+                    if (($uri == $currentMethod || !in_array($uri, $existMethodList)) && !in_array(strtolower($uri), $actionList)) {
                         $uriList[] = $uri;
                     }
                 }
@@ -225,7 +259,7 @@ class MenuService extends BaseService
      */
     public function saveMenu($data)
     {
-        $selector = Db::table('Menu');
+        $selector = \Db::table('Menu');
         if (isset($data['id']) && $data['id']) {
             if ($data['id'] == $data['parent_id']) {
                 throw new \Exception('不能选择自身作为父级功能');
@@ -238,9 +272,9 @@ class MenuService extends BaseService
         }
 
         if (isset($data['id']) && $data['id']) {
-            Db::table('Menu')->where(['id' => $data['id']])->update($data);
+            \Db::table('Menu')->where(['id' => $data['id']])->update($data);
         } else {
-            Db::table('Menu')->insert($data);
+            \Db::table('Menu')->insert($data);
         }
     }
 }

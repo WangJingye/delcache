@@ -6,40 +6,41 @@
 </nav>
 <div class="tab-content bd-tab-content">
     <div class="tab-pane fade show active" id="nav-profile" role="tabpanel">
-        <form id="change-user-info-form" class="form-box col-12 col-sm-8 col-md-6" action="<?= $this->createUrl('system/admin/changeProfile') ?>" method="post">
+        <form id="change-user-info-form" class="form-box col-12 col-sm-8 col-md-6"
+              action="<?= \App::$urlManager->createUrl('system/admin/change-profile') ?>" method="post">
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">用户名</label>
                 <div class="col-sm-8">
-                    <span class="form-control-plaintext"><?= $this->user['username'] ?></span>
+                    <span class="form-control-plaintext"><?= \App::$user['username'] ?></span>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">真实姓名</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="realname" value="<?=$this->user['realname']?>">
+                    <input type="text" class="form-control" name="realname" value="<?= \App::$user['realname'] ?>">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">邮箱地址</label>
                 <div class="col-sm-8">
-                    <input type="email" class="form-control" name="email" value="<?=$this->user['email']?>">
+                    <input type="email" class="form-control" name="email" value="<?= \App::$user['email'] ?>">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">联系电话</label>
                 <div class="col-sm-8">
-                    <input type="tel" class="form-control" name="mobile" value="<?=$this->user['mobile']?>">
+                    <input type="tel" class="form-control" name="mobile" value="<?= \App::$user['mobile'] ?>">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">个人头像</label>
                 <div class="col-sm-8">
                     <div class="fileinput-box">
-                        <?php if (isset($this->user['avatar']) && $this->user['avatar']): ?>
-                            <img src="<?= $this->user['avatar'] ?>">
+                        <?php if (isset(\App::$user['avatar']) && \App::$user['avatar']): ?>
+                            <img src="<?= \App::$user['avatar'] ?>">
                         <?php endif; ?>
                         <div class="fileinput-button">
-                            <div class="plus-symbol" <?= isset($this->user['avatar']) && $this->user['avatar'] ? 'style="display:none"' : '' ?>>
+                            <div class="plus-symbol" <?= isset(\App::$user['avatar']) && \App::$user['avatar'] ? 'style="display:none"' : '' ?>>
                                 +
                             </div>
                             <input class="fileinput-input" type="file" name="file" value="">
@@ -56,7 +57,8 @@
         </form>
     </div>
     <div class="tab-pane fade" id="nav-password" role="tabpanel">
-        <form id="change-password-form" class="form-box col-12 col-sm-8 col-md-6" action="<?= $this->createUrl('system/admin/changePassword')?>" method="post">
+        <form id="change-password-form" class="form-box col-12 col-sm-8 col-md-6"
+              action="<?= \App::$urlManager->createUrl('system/admin/change-password') ?>" method="post">
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">当前登录密码</label>
                 <div class="col-sm-8">
@@ -84,4 +86,4 @@
     </div>
 </div>
 
-<?php $this->appendScript('admin/admin.js')?>
+<?php $this->appendScript('admin.js') ?>

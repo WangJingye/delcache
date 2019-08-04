@@ -1,26 +1,26 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/7/10
- * Time: 3:11 PM
- */
 
-namespace core;
+namespace component;
 
-class Util
+class Session
 {
-    public static function session_set($name, $value = null, $expire = null)
+    public function set($name, $value = null, $expire = null)
     {
         session_start();
-        $_SESSION[$name] = $value;
+        if ($value == null) {
+            if (isset($_SESSION[$name])) {
+                unset($_SESSION[$name]);
+            }
+        } else {
+            $_SESSION[$name] = $value;
+        }
         if ($expire) {
             $_SESSION[$name . '_expire'] = $expire + time();
         }
         session_write_close();
     }
 
-    public static function session_get($name)
+    public function get($name)
     {
         $value = null;
         session_start();
@@ -32,14 +32,5 @@ class Util
         }
         session_write_close();
         return $value;
-    }
-
-    public static function session_unset($name)
-    {
-        session_start();
-        if (isset($_SESSION[$name])) {
-            unset($_SESSION[$name]);
-        }
-        session_write_close();
     }
 }

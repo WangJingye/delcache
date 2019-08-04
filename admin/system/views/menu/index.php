@@ -1,11 +1,9 @@
-<h3>菜单列表</h3>
-<hr>
 <div class="btn-box clearfix">
-    <a href="<?= $this->createUrl('system/menu/editMenu') ?>">
+    <a href="<?= \App::$urlManager->createUrl('system/menu/edit-menu') ?>">
         <div class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i> 创建</div>
     </a>
 </div>
-<form class="search-form" action="<?= $this->createUrl('system/menu/index') ?>" method="get">
+<form class="search-form" action="<?= \App::$urlManager->createUrl('system/menu/index') ?>" method="get">
     <div class="form-content">
         <span class="col-form-label search-label">菜单状态</span>
         <select class="form-control search-input" name="status">
@@ -51,7 +49,7 @@
                 <td><?= $v['status'] == '1' ? '可用' : '禁用' ?></td>
                 <td><?= date('Y-m-d H:i:s', $v['create_time']) ?></td>
                 <td>
-                    <a href="<?= $this->createUrl('system/menu/editMenu', ['id' => $v['id']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('system/menu/edit-menu', ['id' => $v['id']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
                     </a>
                     <?php if($v['status']==1):?>
@@ -71,4 +69,4 @@
     </table>
 </div>
 <?= $this->pagination ?>
-<?php $this->appendScript('admin/menu.js')?>
+<?php $this->appendScript('menu.js')?>

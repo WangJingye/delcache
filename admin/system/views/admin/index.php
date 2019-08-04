@@ -1,11 +1,9 @@
-<h3>账号列表</h3>
-<hr>
 <div class="btn-box clearfix">
-    <a href="<?= $this->createUrl('system/admin/editAdmin') ?>">
+    <a href="<?= \App::$urlManager->createUrl('system/admin/edit-admin') ?>">
         <div class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i> 创建</div>
     </a>
 </div>
-<form class="search-form" action="<?= $this->createUrl('system/admin/index') ?>" method="get">
+<form class="search-form" action="<?= \App::$urlManager->createUrl('system/admin/index') ?>" method="get">
     <div class="form-content">
         <span class="col-form-label search-label">用户状态</span>
         <select class="form-control search-input" name="status">
@@ -53,14 +51,17 @@
                 <td><?= $v['mobile'] ?></td>
                 <td><?= $v['status'] == '1' ? '可用' : '禁用' ?></td>
                 <td>
-                    <a href="<?= $this->createUrl('system/admin/editAdmin', ['admin_id' => $v['admin_id']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('system/admin/edit-admin', ['admin_id' => $v['admin_id']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
                     </a>
-                    <?php if($v['status']==1):?>
+                    <?php if ($v['status'] == 1): ?>
                         <div class="btn btn-danger btn-sm set-status-btn" data-id="<?= $v['admin_id'] ?>" data-status="0"><i class="glyphicon glyphicon-ban-circle"></i> 禁用</div>
-                    <?php else:?>
+                    <?php else: ?>
                         <div class="btn btn-success btn-sm set-status-btn" data-id="<?= $v['admin_id'] ?>" data-status="1"><i class="glyphicon glyphicon-ok-circle"></i> 启用</div>
-                    <?php endif;?>
+                    <?php endif; ?>
+                    <?php if ($v['identity'] == 0 && \App::$user['admin_id'] != $v['admin_id']): ?>
+                    <div class="btn btn-outline-danger btn-sm reset-password-btn" data-id="<?= $v['admin_id'] ?>" data-default="<?= \App::$config->default_password ?>"><i class="glyphicon glyphicon-repeat"></i> 重置密码</div>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>
@@ -73,4 +74,4 @@
     </table>
 </div>
 <?= $this->pagination ?>
-<?php $this->appendScript('admin/admin.js')?>
+<?php $this->appendScript('admin.js')?>

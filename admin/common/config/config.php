@@ -9,7 +9,7 @@ $configs = [
         'system/public' => ['login', 'logout', 'captcha'],
     ],
     'actionWhiteList' => [
-        'system/admin' => ['profile','changePassword','changeProfile']
+        'system/admin' => ['profile', 'change-password', 'change-profile'],
     ]
 ];
 return array_merge($runtimeConfig, $configs);

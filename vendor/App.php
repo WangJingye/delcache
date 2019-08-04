@@ -1,53 +1,72 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/5/27
- * Time: 9:20 PM
- */
+use component\Config;
+use component\Session;
+use component\UrlManager;
 
-namespace core;
-
-class Core
+class App
 {
+    /** @var \Request $request */
+    public static $request;
 
-    /**
-     * @throws \Exception
-     */
+    /** @var array $user */
+    public static $user;
+
+    /** @var UrlManager $urlManager */
+    public static $urlManager;
+
+    /** @var Config */
+    public static $config;
+
+    /** @var Session $session */
+    public static $session;
+
+    public static function init()
+    {
+        static::$config = new Config();
+        static::$urlManager = new UrlManager();
+        static::$session = new Session();
+    }
+
     public static function run()
     {
         try {
             //初始化配置文件
-            Config::init();
+            self::init();
             //处理请求
             $request = Request::instance();
             $request->parseParams();
+            self::$request = $request;
             $action = $request->action;
+            $arr = explode('-', $action);
+            $i = 0;
+            foreach ($arr as $key => $v) {
+                if ($i != 0) {
+                    $arr[$key] = ucfirst($v);
+                }
+                $i++;
+            }
+            $action = implode('', $arr) . 'Action';
             $controller = $request->controller;
-            $controller = ucfirst($controller) . 'Controller';
+            $arr = explode('-', $controller);
+            foreach ($arr as $key => $v) {
+                $arr[$key] = ucfirst($v);
+            }
+            $controller = implode('', $arr) . 'Controller';
             $controller = (APP . '\\' . $request->module . '\\controller' . '\\' . $controller);
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
                 throw new \Exception('Controller is not exist', 404);
             }
-
             /** @var Controller $controller */
             $controller = new $controller();
             if (!in_array($action, get_class_methods($controller))) {
                 throw new \Exception('Action is not exist', 404);
             }
-            $controller->request = $request;
-            if (APP == 'admin') {
-                $controller->layout('main');
-            }
-            $controller->init();
             //执行action
+            $controller->beforeAction();
             $controller->$action();
+            $controller->afterAction();
 
-            if (APP == 'admin') {
-                //渲染界面
-                $controller->display();
-            }
         } catch (\Exception $e) {
             $errorCode = $e->getCode();
             if ($errorCode == 0) {
@@ -68,9 +87,9 @@ class Core
                 $msg = $errorMsg[$errorCode];
             } else {
                 throw new \Exception($e->getMessage(), $e->getCode());
-                $msg = $e->getMessage();
             }
             echo $msg;
         }
     }
+
 }

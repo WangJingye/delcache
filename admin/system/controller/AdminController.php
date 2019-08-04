@@ -2,11 +2,9 @@
 
 namespace admin\system\controller;
 
-
 use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
-use core\Db;
-use core\Util;
+use common\extend\encrypt\Encrypt;
 
 class AdminController extends BaseController
 {
@@ -22,13 +20,13 @@ class AdminController extends BaseController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function indexAction()
     {
-        $params['page'] = $this->request->getParams('page', 1);
-        $params['pageSize'] = $this->request->getParams('pageSize', 10);
-        $params['status'] = $this->request->getParams('status');
-        $params['search_type'] = $this->request->getParams('search_type');
-        $params['search_value'] = $this->request->getParams('search_value');
+        $params['page'] = \App::$request->getParams('page', 1);
+        $params['pageSize'] = \App::$request->getParams('pageSize', 10);
+        $params['status'] = \App::$request->getParams('status');
+        $params['search_type'] = \App::$request->getParams('search_type');
+        $params['search_value'] = \App::$request->getParams('search_value');
         if (!empty($params['search_type'])) {
             $params[$params['search_type']] = $params['search_value'];
         }
@@ -42,10 +40,10 @@ class AdminController extends BaseController
     /**
      * @throws \Exception
      */
-    public function editAdmin()
+    public function editAdminAction()
     {
-        $params = $this->request->params;
-        if ($this->request->isAjax() && $this->request->isPost()) {
+        $params = \App::$request->params;
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 if (!empty($_FILES['file'])) {
                     $file = $_FILES['file'];
@@ -58,7 +56,7 @@ class AdminController extends BaseController
             }
         }
         if (isset($params['admin_id']) && $params['admin_id']) {
-            $model = Db::table('Admin')->where(['admin_id' => $params['admin_id']])->find();
+            $model = \Db::table('Admin')->where(['admin_id' => $params['admin_id']])->find();
             if (!$model) {
                 throw new \Exception('账号不存在');
             }
@@ -70,12 +68,12 @@ class AdminController extends BaseController
      * 账号启用\禁用
      * @throws \Exception
      */
-    public function setStatus()
+    public function setStatusAction()
     {
-        if ($this->request->isAjax() && $this->request->isPost()) {
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $data = $this->request->params;
-                Db::table('Admin')->where(['admin_id' => $data['id']])->update(['status' => $data['status']]);
+                $data = \App::$request->params;
+                \Db::table('Admin')->where(['admin_id' => $data['id']])->update(['status' => $data['status']]);
                 $this->success('修改成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
@@ -83,17 +81,25 @@ class AdminController extends BaseController
         }
     }
 
-    public function profile()
+    public function profileAction()
     {
 
     }
 
-    public function changePassword()
+    public function changePasswordAction()
     {
-        if ($this->request->isAjax() && $this->request->isPost()) {
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = $this->request->params;
-                $this->adminService->changePassword($this->user, $params);
+                $params = \App::$request->params;
+                $user = \App::$user;
+                if ($user['password'] != Encrypt::encryptPassword($params['password'], $user['salt'])) {
+                    throw new \Exception('当前登录密码有误～');
+                }
+                if ($params['newPassword'] != $params['rePassword']) {
+                    throw new \Exception('新密码与验证密码不一致～');
+                }
+                $this->adminService->changePassword($user, $params);
+                \App::$session->set('user');
                 $this->success('修改成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
@@ -101,24 +107,42 @@ class AdminController extends BaseController
         }
     }
 
-    public function changeProfile()
+    public function changeProfileAction()
     {
-        if ($this->request->isAjax() && $this->request->isPost()) {
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = $this->request->params;
+                $params = \App::$request->params;
                 if (!empty($_FILES['file'])) {
                     $file = $_FILES['file'];
                     $params['avatar'] = $this->parseFile($file);
                 }
-                $user = $this->user;
+                $user = \App::$user;
                 $params['admin_id'] = $user['admin_id'];
                 $params['username'] = $user['username'];
                 $this->adminService->saveAdmin($params);
                 foreach ($params as $k => $v) {
                     $user[$k] = $v;
                 }
-                Util::session_set('user', $user);
+                \App::$session->set('user', $user);
                 $this->success('修改成功');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }
+
+    public function resetPasswordAction()
+    {
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
+            try {
+                $params = \App::$request->params;
+                $user = \Db::table('Admin')->where(['admin_id' => $params['admin_id']])->find();
+                if (!$user) {
+                    throw new \Exception('用户信息有误，请刷新重试');
+                }
+                $params['newPassword'] = \App::$config->default_password;
+                $this->adminService->changePassword($user, $params);
+                $this->success('密码已重置');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
             }

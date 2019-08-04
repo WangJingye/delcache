@@ -1,7 +1,6 @@
 <?php
 
-namespace admin\common\Service;
-
+namespace {{app}}\common\service;
 
 class BaseService extends \Service
 {
@@ -16,8 +15,10 @@ class BaseService extends \Service
     public $list;
 
     /**
-     * @param \Db $selector
+     * @param Db $selector
      * @param $params
+     * @return $this
+     * @throws \Exception
      */
     public function pagination($selector, $params)
     {

@@ -1,4 +1,4 @@
-<form id="save-role-admin-form" action="<?= $this->createUrl('system/role/setRoleAdmin') ?>" method="post">
+<form id="save-role-admin-form" action="<?= \App::$urlManager->createUrl('system/role/set-role-admin') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">角色名称</label>
@@ -23,4 +23,4 @@
         </div>
     </div>
 </form>
-<?php $this->appendScript('admin/role.js') ?>
+<?php $this->appendScript('role.js') ?>

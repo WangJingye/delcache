@@ -1,0 +1,10 @@
+<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}') ?>" method="post">
+    <input type="hidden" name="{{primaryKey}}" value="<?= isset($this->model['{{primaryKey}}']) ? $this->model['{{primaryKey}}'] : '' ?>">
+{{inputParams}}
+    <div class="form-group row">
+        <div class="offset-4 col-sm-8">
+            <input class="btn btn-primary" type="submit" value="保存"/>
+        </div>
+    </div>
+</form>
+<?php $this->appendScript('{{controllerUrl}}.js') ?>

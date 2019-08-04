@@ -2,8 +2,6 @@
 
 namespace common\extend\captcha;
 
-use core\Util;
-
 class Captcha
 {
 
@@ -137,7 +135,7 @@ class Captcha
         $secode = [];
         $secode['verify_code'] = $code; // 把校验码保存到session
         $secode['verify_time'] = time(); // 验证码创建时间
-        Util::session_set($key, $secode);
+        \App::$session->set($key, $secode);
 
         @ob_clean();
         ob_start();
@@ -267,7 +265,7 @@ class Captcha
     public function check($code)
     {
         $key = $this->authcode($this->secretKey);
-        $secode = Util::session_get($key);
+        $secode = \App::$session->get($key);
         // 验证码不能为空
         $secode = $secode ? $secode : [];
         if (empty($code) || empty($secode)) {
@@ -275,13 +273,13 @@ class Captcha
         }
         // session 过期
         if (time() - $secode['verify_time'] > $this->expire) {
-            Util::session_unset($key);
+            \App::$session->set($key);
             return false;
         }
 
         if ($this->authcode(strtoupper($code)) == $secode['verify_code']) {
             if ($this->reset) {
-                Util::session_unset($key);
+                \App::$session->set($key);
             };
             return true;
         }

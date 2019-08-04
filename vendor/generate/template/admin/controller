@@ -1,36 +1,36 @@
 <?php
 
-namespace admin\system\controller;
+namespace {{app}}\{{module}}\controller;
 
-use admin\common\controller\BaseController;
-use admin\system\service\MenuService;
+use {{app}}\common\controller\BaseController;
+use {{app}}\{{module}}\service\{{table}}Service;
 
-class MenuController extends BaseController
+class {{table}}Controller extends BaseController
 {
-    /** @var MenuService */
-    public $menuService;
+    /** @var {{table}}Service */
+    public ${{mtable}}Service;
 
     public function init()
     {
-        $this->menuService = new MenuService();
+        $this->{{mtable}}Service = new {{table}}Service();
         parent::init();
     }
 
     /**
      * @throws \Exception
      */
-    public function indexAction()
+    public function index()
     {
         $params['page'] = \App::$request->getParams('page', 1);
         $params['pageSize'] = \App::$request->getParams('pageSize', 10);
-        $params['status'] = \App::$request->getParams('status');
+{{searchParams}}
         $params['search_type'] = \App::$request->getParams('search_type');
         $params['search_value'] = \App::$request->getParams('search_value');
         if (!empty($params['search_type'])) {
             $params[$params['search_type']] = $params['search_value'];
         }
-        /** @var MenuService $res */
-        $res = $this->menuService->getList($params);
+        /** @var {{table}}Service $res */
+        $res = $this->{{mtable}}Service->getList($params);
         $this->assign('params', $params);
         $this->assign('pagination', $this->pagination($res));
         $this->assign('list', $res->list);
@@ -39,43 +39,39 @@ class MenuController extends BaseController
     /**
      * @throws \Exception
      */
-    public function editMenuAction()
+    public function edit{{table}}()
     {
         $params = \App::$request->params;
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $this->menuService->saveMenu($params);
+                $this->{{mtable}}Service->save{{table}}($params);
                 $this->success('保存成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
             }
-
         }
-        if (isset($params['id']) && $params['id']) {
-            $model = \Db::table('Menu')->where(['id' => $params['id']])->find();
+        if (isset($params['{{primaryKey}}']) && $params['{{primaryKey}}']) {
+            $model = \Db::table('{{table}}')->where(['{{primaryKey}}' => $params['{{primaryKey}}']])->find();
             if (!$model) {
-                throw new \Exception('菜单不存在');
+                throw new \Exception('数据不存在');
             }
             $this->assign('model', $model);
-        } else {
-            $params['id'] = 0;
         }
-        $childList = $this->menuService->getChildMenus();
-        $methodList = $this->menuService->getAllMethodList($params['id']);
-        $this->assign('methodList', $methodList);
-        $this->assign('childList', $childList);
     }
 
     /**
      * @throws \Exception
      */
-    public function setStatusAction()
+    public function delete()
     {
+        $params = \App::$request->params;
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $data = \App::$request->params;
-                \Db::table('Menu')->where(['id' => $data['id']])->update(['status' => $data['status']]);
-                $this->success('修改成功');
+                if (!isset($params['{{primaryKey}}']) || $params['{{primaryKey}}'] == '') {
+                    throw new \Exception('非法请求');
+                }
+                $this->{{mtable}}Service->delete{{table}}($params);
+                $this->success('删除成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
             }

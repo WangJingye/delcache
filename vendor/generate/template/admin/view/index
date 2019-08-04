@@ -1,0 +1,52 @@
+<div class="btn-box clearfix">
+    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}') ?>">
+        <div class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i> 创建</div>
+    </a>
+</div>
+<form class="search-form" action="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/index') ?>" method="get">
+    <?php $searchList = {{searchList}}; ?>
+    <div class="form-content">
+        <span class="col-form-label search-label">查询条件</span>
+        <div class="clearfix" style="display: inline-flex;">
+            <select class="form-control search-type" name="search_type">
+                <option value="">请选择</option>
+                <?php foreach ($searchList as $k => $v): ?>
+                    <option value="<?= $k ?>" <?= $this->params['search_type'] == $k ? 'selected' : '' ?>><?= $v ?></option>
+                <?php endforeach; ?>
+            </select>
+            <input type="text" class="form-control search-value" name="search_value" placeholder="关键词"
+                   value="<?= $this->params['search_value'] ?>">
+            <div class="btn btn-primary search-btn text-nowrap"><i class="glyphicon glyphicon-search"></i> 搜索</div>
+        </div>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-bordered list-table text-nowrap">
+        <thead>
+        <tr>
+{{table-header}}
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->list as $v): ?>
+            <tr>
+{{table-body}}
+                <td>
+                    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}', ['{{primaryKey}}' => $v['{{primaryKey}}']]) ?>">
+                        <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
+                    </a>
+                    <div class="btn btn-danger btn-sm remove-btn" data-{{primaryKey}}="<?= $v['{{primaryKey}}'] ?>"><i class="glyphicon glyphicon-trash"></i> 删除</div>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        <?php if (!count($this->list)): ?>
+            <tr>
+                <td colspan="18" class="list-table-nodata">暂无相关数据</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+<?= $this->pagination ?>
+<?php $this->appendScript('{{controllerUrl}}.js')?>

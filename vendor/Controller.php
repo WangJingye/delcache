@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/5/27
- * Time: 9:25 PM
- */
-
-namespace core;
-
 class Controller
 {
     /** @var Controller $this */
@@ -19,8 +10,19 @@ class Controller
     {
     }
 
+    public function beforeAction()
+    {
+
+    }
+
+    public function afterAction()
+    {
+
+    }
+
     public function __construct()
     {
+        $this->init();
     }
 
     public function assign($key, $value)
@@ -43,7 +45,7 @@ class Controller
     public function success($message = '', $data = [])
     {
         $result = [
-            'errno' => 0,
+            'code' => 0,
             'message' => $message,
             'data' => $data,
         ];
@@ -53,12 +55,11 @@ class Controller
     /**
      * @param string $message
      * @param array $data
-     * @throws \Exception
      */
     public function error($message = '', $data = [])
     {
         $result = [
-            'errno' => 1,
+            'code' => 1,
             'message' => $message,
             'data' => $data,
         ];

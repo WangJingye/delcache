@@ -1,14 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/5/27
- * Time: 8:55 PM
- */
-
-namespace core;
-
 class Request
 {
     public $action;
@@ -76,7 +67,7 @@ class Request
         $route = $uri ? explode('/', $uri) : [];
         $config = $this->config;
         if (!$config) {
-            $config = Config::get();
+            $config = \App::$config->instance;
             $this->defaultUri = $config['default_module'] . '/' . $config['default_controller'] . '/' . $config['default_action'];
             $this->config = $config;
         }

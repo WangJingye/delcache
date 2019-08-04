@@ -1,11 +1,9 @@
-<h3>角色列表</h3>
-<hr>
 <div class="btn-box clearfix">
-    <a href="<?= $this->createUrl('system/role/editRole') ?>">
+    <a href="<?= \App::$urlManager->createUrl('system/role/edit-role') ?>">
         <div class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i> 创建</div>
     </a>
 </div>
-<form class="search-form" action="<?= $this->createUrl('system/role/index') ?>" method="get">
+<form class="search-form" action="<?= \App::$urlManager->createUrl('system/role/index') ?>" method="get">
     <div class="form-content">
         <span class="col-form-label search-label">角色状态</span>
         <select class="form-control search-input" name="status">
@@ -51,15 +49,15 @@
                 <td><?= $v['status'] == '1' ? '可用' : '禁用' ?></td>
                 <td><?= date('Y-m-d H:i:s', $v['create_time']) ?></td>
                 <td>
-                    <a href="<?= $this->createUrl('system/role/editRole', ['id' => $v['id']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('system/role/edit-role', ['id' => $v['id']]) ?>">
                         <div class="btn btn-outline-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
                     </a>
-                    <a href="<?= $this->createUrl('system/role/setRoleMenu', ['id' => $v['id']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('system/role/set-role-menu', ['id' => $v['id']]) ?>">
                         <div class="btn btn-outline-primary btn-sm"><i class="glyphicon glyphicon-align-justify"></i>
                             设置角色权限
                         </div>
                     </a>
-                    <a href="<?= $this->createUrl('system/role/setRoleAdmin', ['id' => $v['id']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('system/role/set-role-admin', ['id' => $v['id']]) ?>">
                         <div class="btn btn-outline-primary btn-sm"><i class="glyphicon glyphicon-user"></i> 设置角色用户
                         </div>
                     </a>

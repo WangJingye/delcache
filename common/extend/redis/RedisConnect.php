@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/7/1
- * Time: 10:02 AM
- */
 
 namespace common\extend\redis;
 class RedisConnect
@@ -12,7 +6,7 @@ class RedisConnect
     /** @var \Redis */
     static $redis;
 
-    public static function getInstance()
+    public static function instance()
     {
         if (static::$redis == null) {
             $redis = new \Redis();
@@ -21,10 +15,5 @@ class RedisConnect
             static::$redis = $redis;
         }
         return static::$redis;
-    }
-
-    public function __construct($host, $auth)
-    {
-
     }
 }

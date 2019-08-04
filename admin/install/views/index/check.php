@@ -49,6 +49,6 @@
     </tbody>
 </table>
 <div class="bottom text-center">
-    <a href="<?= $this->createUrl('install/index/check') ?>" class="btn btn-primary">重新检测</a>
-    <a href="<?= $this->createUrl('install/index/setting') ?>" class="btn btn-primary">下一步</a>
+    <a href="<?= \App::$urlManager->createUrl('install/index/check') ?>" class="btn btn-primary">重新检测</a>
+    <a href="<?= \App::$urlManager->createUrl('install/index/setting') ?>" class="btn btn-primary">下一步</a>
 </div>

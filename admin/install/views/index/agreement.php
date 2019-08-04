@@ -8,5 +8,5 @@
   2、您一旦安装使用此软件，即被视为完全理解并接受本协议的各项条款，在享有上述条款授予的权力的同时，受到相关的约束和限制。
 </pre>
 <div class="bottom text-center">
-    <a href="<?= $this->createUrl('install/index/check') ?>" class="btn btn-primary">下一步</a>
+    <a href="<?= \App::$urlManager->createUrl('install/index/check') ?>" class="btn btn-primary">下一步</a>
 </div>

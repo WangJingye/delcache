@@ -73,7 +73,7 @@ function saveRoleAdminForm() {
     toastr.loading('show');
     $.post(form.attr('action'), data, function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message);
         } else {
             toastr.error(res.message);
@@ -91,7 +91,7 @@ function saveRoleMenuForm() {
     toastr.loading('show');
     $.post(form.attr('action'), data, function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message);
         } else {
             toastr.error(res.message);
@@ -105,7 +105,7 @@ function saveForm() {
     toastr.loading('show');
     $.post(form.attr('action'), data, function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message);
         } else {
             toastr.error(res.message);

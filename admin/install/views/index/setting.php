@@ -1,4 +1,4 @@
-<form class="install-form" action="<?= $this->createUrl('install/index/complete') ?>" method="post">
+<form class="install-form" action="<?= \App::$urlManager->createUrl('install/index/complete') ?>" method="post">
     <div class="form-group row">
         <label class="col-sm-2 col-form-label install-table-header">数据库信息</label>
         <div class="col-sm-10">
@@ -81,8 +81,8 @@
         </div>
     </div>
     <div class="bottom text-center">
-        <a href="<?= $this->createUrl('install/index/check') ?>" class="btn btn-primary">上一步</a>
+        <a href="<?= \App::$urlManager->createUrl('install/index/check') ?>" class="btn btn-primary">上一步</a>
         <input type="submit" class="btn btn-primary" value="创建数据">
     </div>
 </form>
-<?php $this->appendScript('admin/install.js')?>
+<?php $this->appendScript('install.js')?>

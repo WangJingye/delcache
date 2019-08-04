@@ -76,11 +76,11 @@ $(function () {
                 required: true
             },
             newPassword: {
-                minlength:6,
+                minlength: 6,
                 required: true
             },
             rePassword: {
-                minlength:6,
+                minlength: 6,
                 required: true,
                 equalTo: "#newPassword"
             }
@@ -90,11 +90,11 @@ $(function () {
                 required: '请输入当前登录密码'
             },
             newPassword: {
-                minlength:'新登录密码不能少于6位',
+                minlength: '新登录密码不能少于6位',
                 required: '请输入新登录密码'
             },
             rePassword: {
-                minlength:'确认密码不能少于6位',
+                minlength: '确认密码不能少于6位',
                 required: '请输入确认新登录密码',
                 equalTo: '确认密码和新登录密码不一致'
             }
@@ -120,9 +120,9 @@ $(function () {
             status: $(this).data('status')
         };
         toastr.loading('show');
-        $.post('/system/admin/setStatus', args, function (res) {
+        $.post('/system/admin/set-status', args, function (res) {
             toastr.loading('hide');
-            if (res.errno == 0) {
+            if (res.code == 0) {
                 toastr.success(res.message, function () {
                     location.reload();
                 });
@@ -131,9 +131,23 @@ $(function () {
             }
         }, 'json');
     });
+    $('.reset-password-btn').click(function () {
+        if (!confirm('是否重置密码为' + $(this).data('default') + '?')) {
+            return false;
+        }
+        toastr.loading('show');
+        $.post('/system/admin/reset-password', {admin_id: $(this).data('id')}, function (res) {
+            toastr.loading('hide');
+            if (res.code == 0) {
+                toastr.success(res.message);
+            } else {
+                toastr.error(res.message);
+            }
+        }, 'json');
+    });
 
-    if(window.location.hash&&$(window.location.hash).get(0)){
-       $('.profile-nav a[href="'+window.location.hash+'"]').tab('show');
+    if (window.location.hash && $(window.location.hash).get(0)) {
+        $('.profile-nav a[href="' + window.location.hash + '"]').tab('show');
     }
 });
 
@@ -157,7 +171,7 @@ function saveForm() {
         contentType: false,
         processData: false,
         success: function (res) {
-            if (res.errno == 0) {
+            if (res.code == 0) {
                 toastr.success(res.message);
             } else {
                 toastr.error(res.message);
@@ -188,10 +202,10 @@ function changeUserForm() {
         contentType: false,
         processData: false,
         success: function (res) {
-            if (res.errno == 0) {
+            if (res.code == 0) {
                 toastr.success(res.message, function () {
                     location.reload();
-                },2000);
+                }, 2000);
             } else {
                 toastr.error(res.message);
             }
@@ -206,10 +220,10 @@ function changePasswordForm() {
     let form = $('#change-password-form');
     $.post(form.attr('action'), form.serialize(), function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message, function () {
                 location.reload();
-            },2000);
+            }, 2000);
         } else {
             toastr.error(res.message);
         }

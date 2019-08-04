@@ -51,7 +51,7 @@ function saveForm() {
     toastr.loading('show');
     $.post(form.attr('action'), form.serialize(), function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message, function () {
                 location.href='/';
             },1000);

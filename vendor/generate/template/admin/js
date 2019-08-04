@@ -1,0 +1,74 @@
+$(function () {
+    $('#save-form').validate({
+        rules: {
+{{rules}}
+        },
+        messages: {
+{{rulesMessage}}
+        },
+        errorClass: "invalid-feedback",
+        errorElement: "div",
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+            $(element).addClass('is-valid');
+        },
+        submitHandler: function (e) {
+            saveForm();
+            return false;
+        }
+    });
+
+    $('.remove-btn').click(function () {
+        if (!confirm('是否删除此记录？')) {
+            return false;
+        }
+        let $this = $(this);
+        let args = {
+            {{primaryKey}}: $(this).data('{{primaryKey}}'),
+        };
+        toastr.loading('show');
+        $.post('/{{module}}/{{controllerUrl}}/delete', args, function (res) {
+            toastr.loading('hide');
+            if (res.errno == 0) {
+                toastr.success(res.message);
+                $this.parents('tr').remove();
+            } else {
+                toastr.error(res.message);
+            }
+        }, 'json');
+    });
+});
+
+function saveForm() {
+    var form = $('#save-form');
+    var formData = new FormData();
+    var data = form.serializeArray();
+    for (var i in data) {
+        formData.append(data[i].name, data[i].value);
+    }
+    if (form.find('input[type=file]').get(0)) {
+        formData.append('file',form.find('input[type=file]')[0].files[0]);
+    }
+    toastr.loading('show');
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        contentType: false,
+        processData: false,
+        success: function (res) {
+            if (res.errno == 0) {
+                toastr.success(res.message);
+            } else {
+                toastr.error(res.message);
+            }
+        },
+        complete: function () {
+            toastr.loading('hide');
+        }
+    });
+}

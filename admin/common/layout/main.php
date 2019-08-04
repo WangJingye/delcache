@@ -9,19 +9,33 @@
     <?php endforeach; ?>
 </head>
 <body style="background-color: #f7f7f9;">
+<?php
+$menuService = new \admin\system\service\MenuService();
+$currentMenu = $menuService->getCurrentMenu();
+$activeMenuList = $menuService->getActiveMenu();
+$topList = $menuService->getTopList();
+$leftList = $menuService->getLeftList();
+$breadcrumbs = [];
+$arr = array_reverse($activeMenuList);
+foreach ($arr as $v) {
+    $tmp = ['name' => $v['name']];
+    $tmp['url'] = $v['url'] != '' ? $v['url'] : '';
+    $breadcrumbs[] = $tmp;
+}
+?>
 <header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar">
     <div class="col-3 col-md-3 col-xl-2">
         <ul class="navbar-nav">
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                    <?php if ($this->user['avatar']): ?>
-                        <img class="rounded-circle" src="<?= $this->user['avatar'] ?>" style="width:30px;height:30px">
+                    <?php if (\App::$user['avatar']): ?>
+                        <img class="rounded-circle" src="<?= \App::$user['avatar'] ?>" style="width:30px;height:30px">
                     <?php endif; ?>
-                    <span><?= $this->user['realname'] ?></span>
+                    <span><?= \App::$user['realname'] ?></span>
                 </a>
                 <div class="dropdown-menu" style="position: absolute">
-                    <a class="dropdown-item" href="<?= $this->createUrl('system/admin/profile') ?>">个人信息</a>
-                    <a class="dropdown-item" href="<?= $this->createUrl('system/public/logout') ?>">登出</a>
+                    <a class="dropdown-item" href="<?= \App::$urlManager->createUrl('system/admin/profile') ?>">个人信息</a>
+                    <a class="dropdown-item" href="<?= \App::$urlManager->createUrl('system/public/logout') ?>">登出</a>
                 </div>
             </li>
         </ul>
@@ -32,9 +46,9 @@
     </button>
     <div class="collapse navbar-collapse" id="top-menu-list">
         <div class="navbar-nav">
-            <?php foreach ($this->menus['topList'] as $v): ?>
-                <a class="nav-item nav-link <?= $v['id'] == $this->menus['active']['topId'] ? 'active' : '' ?>"
-                   href="<?= $v['url'] != '' ? $this->createUrl($v['url']) : 'javascript:void(0)' ?>">
+            <?php foreach ($topList as $v): ?>
+                <a class="nav-item nav-link <?= isset($activeMenuList[$v['id']]) ? 'active' : '' ?>"
+                   href="<?= $v['url'] != '' ? \App::$urlManager->createUrl($v['url']) : 'javascript:void(0)' ?>">
                     <span><i class="<?= $v['icon'] ?>"></i> <?= $v['name'] ?></span>
                 </a>
             <?php endforeach; ?>
@@ -44,17 +58,17 @@
 <div class="row flex-xl-nowrap" style="margin:0">
     <div class="col-12 col-md-3 col-xl-2 bd-sidebar" style="padding: 0">
         <ul class="list-group list-group-flush bd-links">
-            <?php foreach ($this->menus['leftList'][$this->menus['active']['topId']] as $v): ?>
-                <li class="list-group-item main-item <?= $v['id'] == $this->menus['active']['leftId'] ? 'active' : '' ?>">
-                    <div><i class="<?= $v['icon'] ?>"></i> <?= $v['name'] ?></div>
+            <?php foreach ($leftList as $v): ?>
+                <li class="list-group-item main-item <?= isset($activeMenuList[$v['item']['id']]) ? 'active' : '' ?>">
+                    <div><i class="<?= $v['item']['icon'] ?>"></i> <?= $v['item']['name'] ?></div>
                 </li>
-                <?php if (isset($this->menus['childList'][$v['id']]) && count($this->menus['childList'][$v['id']])): ?>
-                    <li class="list-group-item sub-item collapse <?= $v['id'] == $this->menus['active']['leftId'] ? 'show' : '' ?>"
+                <?php if (isset($v['list']) && count($v['list'])): ?>
+                    <li class="list-group-item sub-item collapse <?= isset($activeMenuList[$v['item']['id']]) ? 'show' : '' ?>"
                         style="border-top: 0">
                         <ul class="list-sub-item">
-                            <?php foreach ($this->menus['childList'][$v['id']] as $child): ?>
-                                <li class="list-group-item <?= $this->menus['active']['childId'] == $child['id'] ? 'active' : '' ?>"
-                                    data-url="<?= $this->createUrl($child['url']) ?>"><?= $child['name'] ?></li>
+                            <?php foreach ($v['list'] as $child): ?>
+                                <li class="list-group-item <?= isset($activeMenuList[$child['id']]) ? 'active' : '' ?>"
+                                    data-url="<?= \App::$urlManager->createUrl($child['url']) ?>"><?= $child['name'] ?></li>
                             <?php endforeach; ?>
                         </ul>
                     </li>
@@ -63,26 +77,22 @@
         </ul>
     </div>
     <div class="col-12 col-md-9 col-xl-10 bd-content" style="padding: 0">
-        <nav>
+        <nav aria-label="breadcrumb">
             <ol class="breadcrumb" style="border-radius: 0;margin-bottom: 0;">
-                <li class="breadcrumb-item"><a href="/"><i class="glyphicon glyphicon-home"></i> 主页</a></li>
-                <li class="breadcrumb-item"><a
-                            href="<?= $this->createUrl($this->menus['topList'][$this->menus['active']['topId']]['url']) ?>"><?= $this->menus['topList'][$this->menus['active']['topId']]['name'] ?></a>
+                <li class="breadcrumb-item">
+                    <a href="<?= \App::$urlManager->createUrl('/') ?>">
+                        <i class="glyphicon glyphicon-home"></i> 主页</a>
                 </li>
-                <li class="breadcrumb-item"><a
-                            href="<?= $this->createUrl($this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['url']) ?>"><?= $this->menus['leftList'][$this->menus['active']['topId']][$this->menus['active']['leftId']]['name'] ?></a>
-                </li>
-                <?php if (isset($this->menus['active']['endId'])): ?>
-                    <li class="breadcrumb-item"><a
-                                href="<?= $this->createUrl($this->menus['menuList'][$this->menus['active']['childId']]['url']) ?>"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></a>
+                <?php foreach ($breadcrumbs as $v): ?>
+                    <li class="breadcrumb-item <?= $v['url'] == '' ? 'active' : '' ?>">
+                        <a <?= $v['url'] != '' ? 'href="' . \App::$urlManager->createUrl($v['url']) . '"' : ''; ?>><?= $v['name'] ?></a>
                     </li>
-                    <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['endId']]['name'] ?></li>
-                <?php else: ?>
-                    <li class="breadcrumb-item active"><?= $this->menus['menuList'][$this->menus['active']['childId']]['name'] ?></li>
-                <?php endif; ?>
+                <?php endforeach; ?>
             </ol>
         </nav>
         <div class="bd-container">
+            <h3><?= $currentMenu['name'] ?></h3>
+            <hr>
             <?php include $view ?>
         </div>
     </div>

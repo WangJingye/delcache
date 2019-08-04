@@ -1,4 +1,4 @@
-<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= $this->createUrl('system/role/editRole') ?>" method="post">
+<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= \App::$urlManager->createUrl('system/role/edit-role') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">角色名称</label>
@@ -20,4 +20,4 @@
         </div>
     </div>
 </form>
-<?php $this->appendScript('admin/role.js') ?>
+<?php $this->appendScript('role.js') ?>

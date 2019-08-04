@@ -1,9 +1,6 @@
 $(function () {
     $('#save-form').validate({
         rules: {
-            type: {
-                required: true
-            },
             parent_id: {
                 required: true
             },
@@ -12,9 +9,6 @@ $(function () {
             }
         },
         messages: {
-            type: {
-                required: '请选择功能类型'
-            },
             parent_id: {
                 required: '请选择父级功能'
             },
@@ -43,9 +37,9 @@ $(function () {
             status: $(this).data('status')
         };
         toastr.loading('show');
-        $.post('/system/menu/setStatus', args, function (res) {
+        $.post('/system/menu/set-status', args, function (res) {
             toastr.loading('hide');
-            if (res.errno == 0) {
+            if (res.code == 0) {
                 toastr.success(res.message, function () {
                     location.reload();
                 });
@@ -69,7 +63,7 @@ function saveForm() {
     toastr.loading('show');
     $.post(form.attr('action'), data, function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message);
         } else {
             toastr.error(res.message);

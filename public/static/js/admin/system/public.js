@@ -48,7 +48,7 @@ function submitForm() {
     toastr.loading('show');
     $.post(form.attr('action'), data, function (res) {
         toastr.loading('hide');
-        if (res.errno == 0) {
+        if (res.code == 0) {
             toastr.success(res.message);
             setTimeout(function () {
                 location.href = '/';

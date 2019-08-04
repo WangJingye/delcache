@@ -3,7 +3,7 @@
     <div class="login-head"><h3>后台管理系统</h3></div>
     <div class="login-box">
         <div class="login-title">用户登录</div>
-        <form id="login-form" action="<?= $this->createUrl('system/public/login') ?>" method="post">
+        <form id="login-form" action="<?= \App::$urlManager->createUrl('system/public/login') ?>" method="post">
             <div class="form-group">
                 <div class="input-group">
                     <div class="input-group-prepend">
@@ -31,4 +31,4 @@
         </form>
     </div>
 </div>
-<?php $this->appendScript('admin/public.js') ?>
+<?php $this->appendScript('public.js') ?>

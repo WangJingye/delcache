@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: admin
- * Date: 2019/7/15
- * Time: 2:03 PM
- */
 
 namespace admin\install\controller;
 
@@ -14,20 +8,17 @@ use common\extend\encrypt\Encrypt;
 class IndexController extends BaseController
 {
     public function init()
-    {
-        if (IS_INSTALL) {
-            $this->redirect($this->request->defaultUri);
-        }
+    {  parent::init();
         $this->layout('install');
         $this->appendCss('css/install.css');
         if (IS_INSTALL) {
             $this->error('网站已经安装');
         }
-        parent::init();
+
     }
 
     //用户协议
-    public function agreement()
+    public function agreementAction()
     {
 
     }
@@ -35,7 +26,7 @@ class IndexController extends BaseController
     /**
      * 系统检测
      */
-    public function check()
+    public function checkAction()
     {
         $phpVersion = @phpversion();
         $data['system']['php_os'] = ['name' => '操作系统', 'require' => '类UNIX', 'is_ok' => 1, 'value' => PHP_OS, 'min' => '不限制'];
@@ -65,16 +56,16 @@ class IndexController extends BaseController
         $this->assign('data', $data);
     }
 
-    public function setting()
+    public function settingAction()
     {
 
     }
 
-    public function complete()
+    public function completeAction()
     {
-        if ($this->request->isPost()) {
+        if (\App::$request->isPost()) {
             try {
-                $params = $this->request->params;
+                $params = \App::$request->params;
                 $default = [
                     'host' => '127.0.0.1',
                     'port' => '3306',

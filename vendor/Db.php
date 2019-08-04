@@ -1,11 +1,10 @@
 <?php
 
-namespace core;
+use component\DataBase;
 
 class Db
 {
-    /** @var  \PDO */
-    public $db;
+    private $db;
     private $condition = '';
     private $database = [];
     private $table_name = '';
@@ -14,7 +13,6 @@ class Db
     private $order = '';
     private $rename = '';
     private $join = [];
-    private static $instance;
 
     /**
      * Db constructor.
@@ -29,11 +27,8 @@ class Db
         if (empty($database)) {
             throw new \Exception('database config is missing！', 500);
         }
-        if (is_null($this->db)) {
-            $this->db = new \PDO("mysql:host={$database['hostname']};dbname={$database['database']};port={$database['port']}", $database['username'], $database['password']);
-            $this->db->query("SET NAMES " . $database['charset']);
-        }
         $this->database = $database;
+        $this->db = DataBase::instance($database);
     }
 
     public function rename($as)
@@ -43,27 +38,13 @@ class Db
     }
 
     /**
-     * @param array $database
-     * @return Db
-     * @throws \Exception
-     */
-    public static function instance($database = [])
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new static($database);
-        }
-        self::$instance->clear();
-        return self::$instance;
-    }
-
-    /**
      * @param $table
      * @return Db
      * @throws \Exception
      */
     public static function table($table)
     {
-        $instance = Db::instance();
+        $instance = new Db();
         $table = $instance->database['prefix'] . trim(preg_replace('/([A-Z])/', '_$1', $table), '_');
         $instance->table_name = strtolower($table);
         return $instance;
@@ -248,7 +229,7 @@ class Db
      */
     public static function startTrans()
     {
-        Db::instance()->db->beginTransaction();
+        DataBase::instance()->beginTransaction();
     }
 
     /**
@@ -256,7 +237,7 @@ class Db
      */
     public static function rollback()
     {
-        Db::instance()->db->rollBack();
+        DataBase::instance()->rollback();
     }
 
     /**
@@ -264,7 +245,7 @@ class Db
      */
     public static function commit()
     {
-        Db::instance()->db->commit();
+        DataBase::instance()->commit();
     }
 
     /**
@@ -272,14 +253,17 @@ class Db
      */
     public function update($data)
     {
-        if (!isset($data['update_time'])) {
+        if (!isset($data['update_time']) || $data['update_time'] == '') {
             $fields = $this->getFields();
             if (isset($fields['update_time'])) {
                 $data['update_time'] = time();
             }
         }
         $sql = $this->array2sql($this->table_name, $data, 'update', $this->condition);
-        $this->db->exec($sql);
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
+            throw new \Exception($error[2]);
+        }
     }
 
     /**
@@ -290,8 +274,11 @@ class Db
     {
         $fields = $this->getFields();
         //自动添加创建时间
-        if (!isset($data['create_time']) && isset($fields['create_time'])) {
+        if ((!isset($data['create_time']) || $data['create_time'] == '') && isset($fields['create_time'])) {
             $data['create_time'] = time();
+        }
+        if ((!isset($data['update_time']) || $data['update_time'] == '') && isset($fields['update_time'])) {
+            $data['update_time'] = time();
         }
         //未指定主键值时，主键字段不插入
         foreach ($fields as $field => $v) {
@@ -304,7 +291,10 @@ class Db
             }
         }
         $sql = $this->array2sql($this->table_name, $data);
-        $this->db->exec($sql);
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
+            throw new \Exception($error[2]);
+        }
         return $this->db->lastInsertId();
     }
 
@@ -319,9 +309,14 @@ class Db
         }
         $fields = $this->getFields();
         //自动添加创建时间
-        if (!isset($list[0]['create_time']) && isset($fields['create_time'])) {
+        if ((!isset($list[0]['create_time']) || $list[0]['create_time'] == '') && isset($fields['create_time'])) {
             foreach ($list as $k => $data) {
                 $list[$k]['create_time'] = time();
+            }
+        }
+        if ((!isset($list[0]['update_time']) || $list[0]['update_time'] == '') && isset($fields['update_time'])) {
+            foreach ($list as $k => $data) {
+                $list[$k]['update_time'] = time();
             }
         }
         //未指定主键值时，主键字段不插入
@@ -373,11 +368,37 @@ class Db
         }
     }
 
-    protected function getFields()
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getFields()
     {
-        $sql = 'show columns from ' . $this->table_name;
-        $fields = $this->findAll($sql);
-        return array_column($fields, null, 'Field');
+        $sql = 'show columns from ' . $this->table_name . ';';
+        $rows = $this->findAll($sql);
+        return array_column($rows, null, 'Field');
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getKeys()
+    {
+        $sql = 'show keys from ' . $this->table_name . ';';
+        $rows = $this->findAll($sql);
+        return $rows;
+    }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getComments()
+    {
+        $sql = 'SELECT column_name, column_comment FROM information_schema.columns WHERE table_name = \'' . $this->table_name . '\' and table_schema=\'' . $this->database['database'] . '\';';
+        $rows = $this->findAll($sql);
+        return $rows;
     }
 
 

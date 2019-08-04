@@ -5,8 +5,6 @@ $configs = [
         'default_module' => 'system',
         // 禁止访问模块
         'deny_module_list' => ['common'],
-
-        'module_list' => ['system'],
         // 默认控制器名
         'default_controller' => 'menu',
         // 默认操作名
@@ -17,8 +15,6 @@ $configs = [
         'default_module' => 'home',
         // 禁止访问模块
         'deny_module_list' => ['common'],
-
-        'module_list' => ['home'],
         // 默认控制器名
         'default_controller' => 'index',
         // 默认操作名

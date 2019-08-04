@@ -1,4 +1,4 @@
-<form id="save-role-menu-form" action="<?= $this->createUrl('system/role/setRoleMenu') ?>" method="post">
+<form id="save-role-menu-form" action="<?= \App::$urlManager->createUrl('system/role/set-role-menu') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">角色名称</label>
@@ -23,4 +23,4 @@
 <script>
     var menuList =<?=json_encode($this->menuList);?>;
 </script>
-<?php $this->appendScript('admin/role.js') ?>
+<?php $this->appendScript('role.js') ?>

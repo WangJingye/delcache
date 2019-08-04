@@ -1,19 +1,5 @@
-<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= $this->createUrl('system/menu/editMenu') ?>" method="post">
+<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= \App::$urlManager->createUrl('system/menu/edit-menu') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
-    <div class="form-group row">
-        <label class="col-sm-4 text-nowrap col-form-label form-label">功能类型</label>
-        <div class="col-sm-8">
-            <?php foreach (['0' => '头部导航', '1' => '左部菜单', '2' => '左部功能', '3' => '列表功能'] as $key => $v): ?>
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                        <input class="form-check-input" type="radio" name="type"
-                               value="<?= $key ?>" <?= isset($this->model['type']) && $this->model['type'] == $key ? 'checked' : '' ?>>
-                        <?= $v ?>
-                    </label>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">父级功能</label>
         <div class="col-sm-8">
@@ -70,4 +56,4 @@
         </div>
     </div>
 </form>
-<?php $this->appendScript('admin/menu.js') ?>
+<?php $this->appendScript('menu.js') ?>

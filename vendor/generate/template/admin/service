@@ -1,0 +1,46 @@
+<?php
+
+namespace {{app}}\{{module}}\service;
+
+use {{app}}\common\service\BaseService;
+
+class {{table}}Service extends BaseService
+{
+    /**
+     * @param $params
+     * @return array
+     * @throws \Exception
+     */
+    public function getList($params, $ispage = true)
+    {
+        $selector = \Db::table('{{table}}');
+{{selectorParams}}
+        if ($ispage) {
+            return $this->pagination($selector, $params);
+        }
+        return $selector->findAll();
+    }
+
+    /**
+     * @param $data
+     * @throws \Exception
+     */
+    public function save{{table}}($data)
+    {{{checkUnique}}
+        if (isset($data['{{primaryKey}}']) && $data['{{primaryKey}}']) {
+            \Db::table('{{table}}')->where(['{{primaryKey}}' => $data['{{primaryKey}}']])->update($data);
+        } else {
+            \Db::table('{{table}}')->insert($data);
+        }
+    }
+
+    /**
+     * @param $data
+     * @throws \Exception
+     */
+    public function delete{{table}}($data)
+    {
+        \Db::table('{{table}}')->where($data)->delete();
+    }
+
+}
