@@ -41,10 +41,10 @@
             <div class="btn btn-danger show-table">填充字段数据</div>
         </div>
     </div>
-    <?php if(!empty($data)&&!isset($data['comment'])):?>
-    <div  class="form-group" >
-        <div style="color:red">请填充字段数据</div>
-    </div>
+    <?php if (!empty($data) && !isset($data['fcomment'])): ?>
+        <div class="form-group">
+            <div style="color:red">请填充字段数据</div>
+        </div>
     <?php endif;?>
     <?php if (isset($data['fcomment'])): ?>
         <div class="form-group" id="show-table-form-group">
