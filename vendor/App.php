@@ -37,6 +37,10 @@ class App
             $request = Request::instance();
             $request->parseParams();
             self::$request = $request;
+            if ($request->controller == 'generate' && $request->module == self::$config->default_module) {
+                self::generateHtml();
+                exit;
+            }
             $action = $request->action;
             $arr = explode('-', $action);
             $i = 0;
@@ -90,6 +94,30 @@ class App
             }
             echo $msg;
         }
+    }
+
+    public static function generateHtml()
+    {
+        $data = [];
+        if (self::$request->isPost()) {
+            $data = self::$request->params;
+            if ($data['type'] == 'show-table') {
+                try {
+                    $fields = Db::table($data['table'])->getFields();
+                    echo json_encode(['code' => '0', 'data' => array_keys($fields)]);
+
+                } catch (Exception $e) {
+                    echo json_encode(['code' => '1', 'message' => $e->getMessage()]);
+                }
+                die;
+            } else {
+                if (isset($data['fcomment'])) {
+                    generate\Generate::instance($data)->run();
+                }
+            }
+        }
+        $view = BASE_PATH . 'vendor/generate/view.php';
+        include $view;
     }
 
 }

@@ -8,7 +8,7 @@ use {{app}}\{{module}}\service\{{table}}Service;
 class {{table}}Controller extends BaseController
 {
     /** @var {{table}}Service */
-    public ${{mtable}}Service;
+    public ${{mtable}}Service;{{otherDefineService}}
 
     public function init()
     {
@@ -19,11 +19,10 @@ class {{table}}Controller extends BaseController
     /**
      * @throws \Exception
      */
-    public function index()
+    public function indexAction()
     {
         $params['page'] = \App::$request->getParams('page', 1);
-        $params['pageSize'] = \App::$request->getParams('pageSize', 10);
-{{searchParams}}
+        $params['pageSize'] = \App::$request->getParams('pageSize', 10);{{searchParams}}
         $params['search_type'] = \App::$request->getParams('search_type');
         $params['search_value'] = \App::$request->getParams('search_value');
         if (!empty($params['search_type'])) {
@@ -33,13 +32,13 @@ class {{table}}Controller extends BaseController
         $res = $this->{{mtable}}Service->getList($params);
         $this->assign('params', $params);
         $this->assign('pagination', $this->pagination($res));
-        $this->assign('list', $res->list);
+        $this->assign('list', $res->list);{{otherAssign}}
     }
 
     /**
      * @throws \Exception
      */
-    public function edit{{table}}()
+    public function edit{{table}}Action()
     {
         $params = \App::$request->params;
         if (\App::$request->isAjax() && \App::$request->isPost()) {
@@ -50,19 +49,21 @@ class {{table}}Controller extends BaseController
                 $this->error($e->getMessage());
             }
         }
+        $this->title = '创建{{tablename}}';
         if (isset($params['{{primaryKey}}']) && $params['{{primaryKey}}']) {
             $model = \Db::table('{{table}}')->where(['{{primaryKey}}' => $params['{{primaryKey}}']])->find();
             if (!$model) {
                 throw new \Exception('数据不存在');
             }
             $this->assign('model', $model);
-        }
+            $this->title = '编辑{{tablename}} - ' . $model['{{primaryKey}}'];
+        }{{otherAssign}}
     }
 
     /**
      * @throws \Exception
      */
-    public function delete()
+    public function deleteAction()
     {
         $params = \App::$request->params;
         if (\App::$request->isAjax() && \App::$request->isPost()) {

@@ -1,7 +1,7 @@
 <?php
 
 define('APP', 'admin');
-define("APP_VERSION", 'V1.0.0');
+define('APP_VERSION', 'V1.0.0');
 
 // 调试模式开关
 define("APP_DEBUG", true);

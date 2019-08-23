@@ -6,6 +6,7 @@ use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
 use common\extend\captcha\Captcha;
 use common\extend\encrypt\Encrypt;
+use generate\Generate;
 
 class PublicController extends BaseController
 {
@@ -27,6 +28,9 @@ class PublicController extends BaseController
                     throw new \Exception('验证码不正确');
                 }
                 $user = \Db::table('Admin')->where(['username' => $params['username']])->find();
+                if (!$user) {
+                    throw new \Exception('用户名密码不正确');
+                }
                 if ($user['status'] == 0) {
                     throw new \Exception('您的账号已禁用，请联系管理员～');
                 }

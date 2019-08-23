@@ -8,11 +8,12 @@ class Generate
     private $table;
     private $controllerUrl;
     private $module;
+    private $theme;
     private $primaryKey;
+    private $option;
     private $app;
-    private $columns = [];
+    private $columnTypes;
     private $uniqueColumns = [];
-    private $comments = [];
     private $templatePath = '';
     private static $instance;
 
@@ -23,20 +24,17 @@ class Generate
      * @param $table
      * @throws \Exception
      */
-    public function __construct($app, $module, $table)
+    public function __construct($option)
     {
-        $this->templatePath = dirname(__FILE__) . '/template/admin/';
-        if ($app == 'api') {
-            $this->templatePath = dirname(__FILE__) . '/template/api/';
-        }
-        $this->app = $app;
-        $this->table = ucfirst($table);
-        $this->module = $module;
+        $this->theme = $option['template'];
+        $this->templatePath = dirname(__FILE__) . '/template/' . $this->theme . '/';
+
+        $this->app = $option['app'];
+        $this->table = ucfirst($option['table']);
+        $this->module = $option['module'];
         $this->controllerUrl = strtolower(trim(preg_replace('/([A-Z])/', '-$1', $this->table), '-'));
-        $fields = \Db::table($table)->getFields();
-        $keys = \Db::table($table)->getKeys();
-        $comments = \Db::table($table)->getComments();
-        $this->comments = array_column($comments, 'column_comment', 'column_name');
+        $keys = \Db::table($option['table'])->getKeys();
+        $this->option = $option;
         $uniqueColumns = [];
         foreach ($keys as $v) {
             //主键单独处理
@@ -49,38 +47,25 @@ class Generate
                 $uniqueColumns[$v['Key_name']][] = $v['Column_name'];
             }
         }
-        $this->uniqueColumns = $uniqueColumns;
-        $columns = [];
+        $columnTypes = [];
+        $fields = \Db::table($option['table'])->getFields();
         foreach ($fields as $field => $v) {
-            $arr = [];
-            $arr['field'] = $field;
-            $arr['default'] = $v['Default'] == 'NULL' ? '' : $v['Default'];
-            $arr['form_type'] = 'input';
-            if (strpos(strtolower($v['Type']), 'tinyint') !== false) {
-                $arr['form_type'] = 'radio';
-            }
-            if (strpos($this->comments[$field], 'select') !== false) {
-                $arr['form_type'] = 'select';
-            }
-            $this->comments[$field] = trim(str_replace('select', '', $this->comments[$field]));
+            $type = [];
             if (strpos($v['Type'], 'int') !== false) {
-                $arr['type'] = 'int';
+                $type = 'int';
             } elseif (strpos($v['Type'], 'char') !== false || strpos($v['Type'], 'ext') !== false) {
-                $arr['type'] = 'string';
+                $type = 'string';
             } elseif (strpos($v['Type'], 'float') !== false ||
                 strpos($v['Type'], 'float') !== false ||
                 strpos($v['Type'], 'double') !== false ||
                 strpos($v['Type'], 'decimal') !== false
             ) {
-                $arr['type'] = 'float';
+                $type = 'float';
             }
-            $arr['null'] = 0;
-            if ($v['Null'] == 'YES') {
-                $arr['null'] = 1;
-            }
-            $columns[] = $arr;
+            $columnTypes[$field] = $type;
         }
-        $this->columns = $columns;
+        $this->columnTypes = $columnTypes;
+        $this->uniqueColumns = $uniqueColumns;
     }
 
     /**
@@ -90,10 +75,10 @@ class Generate
      * @return Generate
      * @throws \Exception
      */
-    public static function instance($app, $module, $table)
+    public static function instance($option)
     {
         if (is_null(self::$instance)) {
-            self::$instance = new static($app, $module, $table);
+            self::$instance = new static($option);
         }
         return self::$instance;
     }
@@ -164,12 +149,12 @@ class Generate
         $file = $this->templatePath . 'service';
         $str = file_get_contents($file);
         $selectorParams = '';
-        foreach ($this->columns as $v) {
-            $selectorParams .= '        if (isset($params[\'' . $v['field'] . '\']) && $params[\'' . $v['field'] . '\'] != \'\') {' . PHP_EOL;
-            if ($v['type'] == 'string') {
-                $where = '[\'' . $v['field'] . '\' => [\'like\', \'%\' . $params[\'' . $v['field'] . '\'] . \'%\']]';
+        foreach ($this->option['fcomment'] as $field => $label) {
+            $selectorParams .= '        if (isset($params[\'' . $field . '\']) && $params[\'' . $field . '\'] != \'\') {' . PHP_EOL;
+            if ($this->columnTypes[$field] == 'string') {
+                $where = '[\'' . $field . '\' => [\'like\', \'%\' . $params[\'' . $field . '\'] . \'%\']]';
             } else {
-                $where = '[\'' . $v['field'] . '\' => $params[\'' . $v['field'] . '\']]';
+                $where = '[\'' . $field . '\' => $params[\'' . $field . '\']]';
             }
             $selectorParams .= '            $selector->where(' . $where . ');' . PHP_EOL;
             $selectorParams .= '        }' . PHP_EOL;
@@ -185,7 +170,7 @@ class Generate
                 $checkUnique .= '        $check = [];' . PHP_EOL;
                 foreach ($vList as $v) {
                     $checkUnique .= '        $check[\'' . $v . '\'] = $data[\'' . $v . '\'];' . PHP_EOL;
-                    $message[] = $this->comments[$v];
+                    $message[] = $this->option['fcomment'][$v];
                 }
                 $checkUnique .= '        $selector->where($check);' . PHP_EOL;
             }
@@ -219,16 +204,36 @@ class Generate
         $file = $this->templatePath . 'controller';
         $str = file_get_contents($file);
         $searchParams = '';
-        foreach ($this->columns as $v) {
-            $searchParams .= '        $params[\'' . $v['field'] . '\'] = \App::$request->getParams(\'' . $v['field'] . '\');' . PHP_EOL;
+        $otherAssign = '';
+        $otherDefineService = '';
+        foreach ($this->option['fcomment'] as $field => $label) {
+            $searchParams .= PHP_EOL . '        $params[\'' . $field . '\'] = \App::$request->getParams(\'' . $field . '\');';
+            if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+                $res = $this->getChooseList($field);
+                if ($res['type'] == 1) {
+                    $otherDefineService .= PHP_EOL . '    public $' . $res['variable'] . ' = [';
+                    foreach ($res['list'] as $key => $v) {
+                        $otherDefineService .= PHP_EOL . '        \'' . $key . '\' => \'' . $v . '\',';
+                    }
+                    $otherDefineService .= PHP_EOL . '    ];';
+                    $otherAssign .= PHP_EOL . '        $this->assign(\'' . $res['variable'] . '\', $this->' . $res['variable'] . ');';
+                } else {
+                    $otherAssign .= PHP_EOL . '        $' . $res['variable'] . ' = \Db::table(\'' . $res['table'] . '\')->field([\'' . $res['key'] . '\', \'' . $res['value'] . '\'])->findAll();';
+                    $otherAssign .= PHP_EOL . '        $' . $res['variable'] . ' = array_column($' . $res['variable'] . ', \'' . $res['value'] . '\',\'' . $res['key'] . '\');';
+                    $otherAssign .= PHP_EOL . '        $this->assign(\'' . $res['variable'] . '\', $' . $res['variable'] . ');';
+                }
+            }
         }
         $str = str_replace('{{table}}', $this->table, $str);
+        $str = str_replace('{{otherDefineService}}', $otherDefineService, $str);
+        $str = str_replace('{{otherAssign}}', $otherAssign, $str);
         $str = str_replace('{{controllerUrl}}', $this->controllerUrl, $str);
         $str = str_replace('{{mtable}}', lcfirst($this->table), $str);
         $str = str_replace('{{app}}', $this->app, $str);
         $str = str_replace('{{module}}', $this->module, $str);
         $str = str_replace('{{searchParams}}', $searchParams, $str);
         $str = str_replace('{{primaryKey}}', $this->primaryKey, $str);
+        $str = str_replace('{{tablename}}', $this->option['name'], $str);
         if (!file_exists($filename)) {
             file_put_contents($filename, $str);
         }
@@ -243,32 +248,57 @@ class Generate
         }
         //edit
         $inputParams = '';
-        foreach ($this->columns as $v) {
-            if ($v['field'] == $this->primaryKey) {
+        foreach ($this->option['fcomment'] as $field => $label) {
+            if ($field == $this->primaryKey) {
                 continue;
             }
-            $inputParams .= '    <div class="form-group row">' . PHP_EOL;
-            $inputParams .= '        <label class="col-sm-4 text-nowrap col-form-label form-label">' . $this->comments[$v['field']] . '</label>' . PHP_EOL;
-            $inputParams .= '        <div class="col-sm-8 form-radio-group">' . PHP_EOL;
-            if ($v['form_type'] == 'select') {
-                $inputParams .= '            <select name="' . $v['field'] . '" class="form-control">' . PHP_EOL;
-                $inputParams .= '                <option value="">请选择</option>' . PHP_EOL;
-                $inputParams .= '            </select>' . PHP_EOL;
-            } else if ($v['form_type'] == 'radio') {
-                $inputParams .= '            <?php foreach ([\'0\' => \'否\', \'1\' => \'是\'] as $k => $v): ?>' . PHP_EOL;
-                $inputParams .= '                <div class="form-check form-check-inline text-nowrap">' . PHP_EOL;
-                $inputParams .= '                    <label class="form-check-label">' . PHP_EOL;
-                $inputParams .= '                        <input class="form-check-input" type="radio" name="' . $v['field'] . '"' . PHP_EOL;
-                $inputParams .= '                               value="<?= $k ?>" <?= (isset($this->model[\'' . $v['field'] . '\']) && $this->model[\'' . $v['field'] . '\'] == $k || $k=="' . $v['default'] . '") ? \'checked\' : \'\' ?>>' . PHP_EOL;
-                $inputParams .= '                        <?= $v ?>' . PHP_EOL;
-                $inputParams .= '                    </label>' . PHP_EOL;
-                $inputParams .= '                </div>' . PHP_EOL;
-                $inputParams .= '            <?php endforeach; ?>' . PHP_EOL;
-            } else {
-                $inputParams .= '            <input type="text" name="' . $v['field'] . '" class="form-control" value="<?= isset($this->model[\'' . $v['field'] . '\']) ? $this->model[\'' . $v['field'] . '\'] : "' . $v['default'] . '" ?>" placeholder="请输入' . $this->comments[$v['field']] . '">' . PHP_EOL;
+            if (!isset($this->option['feditshow'][$field]) || $this->option['feditshow'][$field] == 0) {
+                continue;
             }
-            $inputParams .= '        </div>' . PHP_EOL;
-            $inputParams .= '    </div>' . PHP_EOL;
+            $inputParams .= PHP_EOL . '    <div class="form-group row">';
+            $inputParams .= PHP_EOL . '        <label class="col-sm-4 text-nowrap col-form-label form-label">' . $label . '</label>';
+            $inputParams .= PHP_EOL . '        <div class="col-sm-8 form-radio-group">';
+            if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+                $res = $this->getChooseList($field);
+            }
+            if ($this->option['ftype'][$field] == 'select') {
+                $inputParams .= PHP_EOL . '            <select name="' . $field . '" class="form-control">';
+                $inputParams .= PHP_EOL . '                <option value="">请选择</option>';
+                $inputParams .= PHP_EOL . '                <?php foreach ($this->' . $res['variable'] . ' as $key => $v): ?>';
+                $inputParams .= PHP_EOL . '                    <option value="<?= $key ?>" <?= isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $key ? \'selected\' : \'\' ?>><?= $v ?></option>';
+                $inputParams .= PHP_EOL . '                <?php endforeach; ?>';
+                $inputParams .= PHP_EOL . '            </select>';
+            } else if ($this->option['ftype'][$field] == 'radio') {
+                $inputParams .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
+                $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
+                $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
+                $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="radio" name="' . $field . '"';
+                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $k) ? \'checked\' : \'\' ?>>';
+                $inputParams .= PHP_EOL . '                        <?= $v ?>';
+                $inputParams .= PHP_EOL . '                    </label>';
+                $inputParams .= PHP_EOL . '                </div>';
+                $inputParams .= PHP_EOL . '            <?php endforeach; ?>';
+            } else if ($this->option['ftype'][$field] == 'checkbox') {
+                $inputParams .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
+                $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
+                $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
+                $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="checked" name="' . $field . '"';
+                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $k) ? \'checked\' : \'\' ?>>';
+                $inputParams .= PHP_EOL . '                        <?= $v ?>';
+                $inputParams .= PHP_EOL . '                    </label>';
+                $inputParams .= PHP_EOL . '                </div>';
+                $inputParams .= PHP_EOL . '            <?php endforeach; ?>';
+            } else if ($this->option['ftype'][$field] == 'textarea') {
+                $inputParams .= PHP_EOL . '            <textarea name="' . $field . '" class="form-control" placeholder="请输入' . $label . '"><?= isset($this->model[\'' . $field . '\']) ? $this->model[\'' . $field . '\'] : "" ?></textarea>';
+            } else {
+                $placeholder = '请输入' . $label;
+                if ($this->option['ftype'][$field] == 'date') {
+                    $placeholder = $label . '，格式为2019-01-01';
+                }
+                $inputParams .= PHP_EOL . '            <input type="text" name="' . $field . '" class="form-control" value="<?= isset($this->model[\'' . $field . '\']) ? $this->model[\'' . $field . '\'] : "" ?>" placeholder="' . $placeholder . '">';
+            }
+            $inputParams .= PHP_EOL . '        </div>';
+            $inputParams .= PHP_EOL . '    </div>';
         }
         $filename = $dir . '/edit-' . $this->controllerUrl . '.php';
         $file = $this->templatePath . 'view/edit';
@@ -286,12 +316,42 @@ class Generate
         }
         //index
         $searchs = [];
+        $searchPer = '';
         $header = '';
         $body = '';
-        foreach ($this->columns as $v) {
-            $searchs[] = '\'' . $v['field'] . '\' => \'' . $this->comments[$v['field']] . '\'';
-            $header .= '            <th>' . $this->comments[$v['field']] . '</th>' . PHP_EOL;
-            $body .= '                <td><?= $v[\'' . $v['field'] . '\'] ?></td>' . PHP_EOL;
+        foreach ($this->option['fcomment'] as $field => $label) {
+            $res = $this->getChooseList($field);
+            if (isset($this->option['fpageshow'][$field]) && $this->option['fpageshow'][$field] == 1) {
+                $header .= '            <th>' . $label . '</th>' . PHP_EOL;
+                if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+                    $body .= '                <td><?= $this->' . $res['variable'] . '[$v[\'' . $field . '\']] ?></td>' . PHP_EOL;
+                } else if ($this->option['ftype'][$field] == 'date') {
+                    $body .= '                <td><?= date(\'Y-m-d\', $v[\'' . $field . '\']) ?></td>' . PHP_EOL;
+
+                } else if ($this->option['ftype'][$field] == 'datetime') {
+                    $body .= '                <td><?= date(\'Y-m-d H:i:s\', $v[\'' . $field . '\']) ?></td>' . PHP_EOL;
+                } else {
+                    $body .= '                <td><?= $v[\'' . $field . '\'] ?></td>' . PHP_EOL;
+                }
+            }
+            if (isset($this->option['fpagesearch1'][$field]) && $this->option['fpagesearch1'][$field] == 1) {
+                $searchPer .= PHP_EOL . '    <div class="form-content">';
+                $searchPer .= PHP_EOL . '        <span class="col-form-label search-label">' . $label . '</span>';
+                if (!in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+                    $searchPer .= PHP_EOL . '        <input class="form-control search-input" name="' . $field . '" value="">';
+                } else {
+                    $searchPer .= PHP_EOL . '        <select class="form-control search-input" name="' . $field . '">';
+                    $searchPer .= PHP_EOL . '            <option value="">请选择</option>';
+                    $searchPer .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
+                    $searchPer .= PHP_EOL . '                <option value="<?= $k ?>" <?= $this->params[\'' . $field . '\'] == (string)$k ? \'selected\' : \'\' ?>><?= $v ?></option>';
+                    $searchPer .= PHP_EOL . '            <?php endforeach; ?>';
+                    $searchPer .= PHP_EOL . '        </select>';
+                }
+                $searchPer .= PHP_EOL . '    </div>';
+            }
+            if (isset($this->option['fpagesearch2'][$field]) && $this->option['fpagesearch2'][$field] == 1) {
+                $searchs[] = '\'' . $field . '\' => \'' . $label . '\'';
+            }
         }
         $searchList = '[' . implode(', ', $searchs) . ']';
 
@@ -304,6 +364,7 @@ class Generate
         $str = str_replace('{{mtable}}', lcfirst($this->table), $str);
         $str = str_replace('{{app}}', $this->app, $str);
         $str = str_replace('{{module}}', $this->module, $str);
+        $str = str_replace('{{searchPer}}', $searchPer, $str);
         $str = str_replace('{{searchList}}', $searchList, $str);
         $str = str_replace('{{table-header}}', $header, $str);
         $str = str_replace('{{table-body}}', $body, $str);
@@ -324,23 +385,24 @@ class Generate
         //js
         $rules = '';
         $rulesMessage = '';
-        foreach ($this->columns as $v) {
-            if ($v['field'] == $this->primaryKey) {
+        foreach ($this->option['fcomment'] as $field => $label) {
+            if ($field == $this->primaryKey) {
                 continue;
             }
-            if (!$v['null']) {
-                if ($rules) {
-                    $rules .= ',' . PHP_EOL;
-                    $rulesMessage .= ',' . PHP_EOL;
-                }
-                $rules .= '            ' . $v['field'] . ': {' . PHP_EOL;
-                $rulesMessage .= '            ' . $v['field'] . ': {' . PHP_EOL;
-                $rules .= '                required: true' . PHP_EOL;;
-                $rulesMessage .= '                required: \'请输入' . $this->comments[$v['field']] . '\'' . PHP_EOL;;
-                $rules .= '            }';
-                $rulesMessage .= '            }';
-
+            if (!isset($this->option['frequire'][$field]) || $this->option['frequire'][$field] == 0) {
+                continue;
             }
+            if ($rules) {
+                $rules .= ',' . PHP_EOL;
+                $rulesMessage .= ',' . PHP_EOL;
+            }
+            $rules .= '            ' . $field . ': {' . PHP_EOL;
+            $rulesMessage .= '            ' . $field . ': {' . PHP_EOL;
+            $rules .= '                required: true' . PHP_EOL;;
+            $rulesMessage .= '                required: \'请输入' . $label . '\'' . PHP_EOL;;
+            $rules .= '            }';
+            $rulesMessage .= '            }';
+
         }
         $filename = $dir . '/' . $this->controllerUrl . '.js';
         $file = $this->templatePath . 'js';
@@ -360,8 +422,43 @@ class Generate
         return $this;
     }
 
+    private function getChooseList($field)
+    {
+        if (isset($this->option['fchoice'][$field])) {
+            if ($this->option['fchoice'][$field] == 1) {
+                $list = $this->option['fchoicelist'][$field] ? explode(',', $this->option['fchoicelist'][$field]) : [];
+                $res = [];
+                $var = $list[0];
+                unset($list[0]);
+                foreach ($list as $v) {
+                    $arr = explode(':', $v);
+                    $res[$arr[0]] = $arr[1];
+                }
+                return ['variable' => $var, 'list' => $res, 'type' => 1];
+            } else {
+                $arr = $this->option['fchoicelist'][$field] ? explode(':', $this->option['fchoicelist'][$field]) : [];
+//                $wheres=explode(',',$arr[4]);
+//                foreach ($wheres as $v){
+//                    explode('',$v)
+//                }
+                $res = ['type' => 2,
+                    'variable' => $arr[3],
+                    'table' => $arr[0],
+                    'key' => $arr[1],
+                    'value' => $arr[2],
+                    'where' => $arr[2],
+                ];
+                return $res;
+            }
+        }
+    }
+
     public function run()
     {
-        $this->common()->module()->service()->controller()->view()->js();
+        if ($this->theme == 'web') {
+            $this->common()->module()->service()->controller()->view()->js();
+        } else {
+            $this->common()->module()->service()->controller();
+        }
     }
 }

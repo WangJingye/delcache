@@ -22,4 +22,26 @@ $(function () {
             box.find('img').remove();
         }
     });
+    $('.main-item').click(function () {
+        $('.sub-item').collapse('hide');
+        $(this).next('.sub-item').collapse('toggle')
+    });
+    $('.list-sub-item .list-group-item').click(function () {
+        location.href = $(this).data('url');
+    });
+    $('.search-form').on('click', '.search-btn', function () {
+        if ($('#page-size').get(0)) {
+            $(this).parents('form').append('<input type="hidden" name="pageSize" value="' + $('#page-size').val() + '"/>');
+        }
+        $(this).parents('form').submit();
+    });
+    $('#page-size').change(function () {
+        var form = $('.search-form');
+        if (!form.find('[name=pageSize]').get(0)) {
+            form.append('<input type="hidden" name="pageSize" value="' + $(this).val() + '">');
+        } else {
+            form.find('[name=pageSize]').val($(this).val());
+        }
+        form.submit();
+    });
 });

@@ -129,7 +129,7 @@ return [
         $sql = 'CREATE DATABASE ' . $config['dbname'] . ' DEFAULT CHARSET ' . $config['charset'] . ' COLLATE ' . $config['charset'] . '_general_ci;';
         $db->exec($sql);
         $db->query('use ' . $config['dbname']);
-        $db->query("SET NAMES " . $config['charset']);
+        $db->query('SET NAMES ' . $config['charset']);
         $sql = file_get_contents(COMMON_PATH . 'config/database.sql');
         $db->exec($sql);
         $salt = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
