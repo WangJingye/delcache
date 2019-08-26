@@ -83,11 +83,12 @@ class Db
         if ($this->condition) {
             $sql .= ' where ' . $this->condition;
         }
-        if ($this->limit) {
-            $sql .= ' limit ' . $this->limit;
-        }
+
         if ($this->order) {
             $sql .= ' order by ' . $this->order;
+        }
+        if ($this->limit) {
+            $sql .= ' limit ' . $this->limit;
         }
         return $sql;
     }
@@ -119,10 +120,6 @@ class Db
      */
     public function find($sql = '')
     {
-        if (is_array($sql)) {
-            echo $this->getSql();
-            die;
-        }
         if (!$sql) {
             $sql = $this->getSql();
         }
@@ -401,6 +398,12 @@ class Db
         return $rows;
     }
 
+    public function getPrimaryKey()
+    {
+        $sql = 'SELECT column_name FROM INFORMATION_SCHEMA.`KEY_COLUMN_USAGE` WHERE table_name=\'' . $this->table_name . '\' AND CONSTRAINT_SCHEMA=\'' . $this->database['database'] . '\'AND constraint_name=\'PRIMARY\';';
+        $row = $this->find($sql);
+        return $row['column_name'];
+    }
 
     /**
      * @param array|string|mixed $name

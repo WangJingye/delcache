@@ -8,6 +8,7 @@ class Request
     public $config;
     public $params;
 
+    public $controllerNamespace;//控制器命名空间
     public $uri;
     public $defaultUri;
 
@@ -33,6 +34,7 @@ class Request
         $this->action = $res['action'];
         $this->controller = $res['controller'];
         $this->uri = $this->module . '/' . $this->controller . '/' . $this->action;
+        //获取controller命名空间
         foreach ($res['params'] as $key => $v) {
             $_GET[$key] = $v;
             $_REQUEST[$key] = $v;
@@ -72,26 +74,44 @@ class Request
             $this->config = $config;
         }
         $params = [];
-        if (count($route) == 0) {
-            $action = $config['default_action'];
-            $controller = $config['default_controller'];
-            $module = $config['default_module'];
-        } else if (count($route) == 1) {
-            $action = $config['default_action'];
-            $controller = $route[0];
-            $module = $config['default_module'];
-        } else if (count($route) == 2) {
-            $action = $route[1];
-            $controller = $route[0];
-            $module = $config['default_module'];
-        } else {
-            $action = $route[2];
-            $controller = $route[1];
-            $module = $route[0];
-            for ($i = 3; $i < count($route); $i += 2) {
-                $params[$route[$i]] = isset($route[$i + 1]) ? $route[$i + 1] : '';
-            }
+        $action = $config['default_action'];
+        $controller = $config['default_controller'];
+        $module = $config['default_module'];
+        if (count($route) == 1) {
+            throw new Exception('page not found');
         }
+        if (count($route) >= 2) {
+            $module = $route[0];
+            $controller = $route[1];
+        }
+        $this->controllerNamespace = $this->getControllerNamespace($controller, $module);
+        if (get_parent_class($this->controllerNamespace) == 'component\RestController') {
+            switch ($this->method()) {
+                case 'GET':
+                    $action = 'index';
+                    break;
+                case 'POST':
+                    $action = 'create';
+                    break;
+                case 'PUT':
+                    $action = 'update';
+                    break;
+                case 'DELETE':
+                    $action = 'delete';
+                    break;
+            }
+            if (count($route) >= 3) {
+                $params['id'] = $route[2];
+            }
+        } else if (count($route) == 2) {
+            throw new Exception('page not found');
+        } else if (count($route) >= 3) {
+            $action = $route[2];
+        }
+        for ($i = 3; $i < count($route); $i += 2) {
+            $params[$route[$i]] = isset($route[$i + 1]) ? $route[$i + 1] : '';
+        }
+
         return [
             'module' => $module,
             'controller' => $controller,
@@ -227,5 +247,15 @@ class Request
             }
         }
         return $params;
+    }
+
+    protected function getControllerNamespace($controller, $module)
+    {
+        $arr = explode('-', $controller);
+        foreach ($arr as $key => $v) {
+            $arr[$key] = ucfirst($v);
+        }
+        $controller = implode('', $arr) . 'Controller';
+        return (APP . '\\' . $module . '\\controller' . '\\' . $controller);
     }
 }

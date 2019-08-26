@@ -51,18 +51,13 @@ class App
                 $i++;
             }
             $action = implode('', $arr) . 'Action';
-            $controller = $request->controller;
-            $arr = explode('-', $controller);
-            foreach ($arr as $key => $v) {
-                $arr[$key] = ucfirst($v);
-            }
-            $controller = implode('', $arr) . 'Controller';
-            $controller = (APP . '\\' . $request->module . '\\controller' . '\\' . $controller);
+            $controller = $request->controllerNamespace;
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
                 throw new \Exception('Controller is not exist', 404);
             }
             /** @var Controller $controller */
             $controller = new $controller();
+
             if (!in_array($action, get_class_methods($controller))) {
                 throw new \Exception('Action is not exist', 404);
             }
