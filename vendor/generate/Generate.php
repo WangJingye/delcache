@@ -161,7 +161,7 @@ class Generate
         }
         $checkUnique = '';
         if (count($this->uniqueColumns)) {
-            $checkUnique .= PHP_EOL . '        $selector = Db::table(\'' . $this->table . '\');' . PHP_EOL;
+            $checkUnique .= PHP_EOL . '        $selector = \Db::table(\'' . $this->table . '\');' . PHP_EOL;
             $checkUnique .= '        if (isset($data[\'' . $this->primaryKey . '\']) && $data[\'' . $this->primaryKey . '\']) {' . PHP_EOL;
             $checkUnique .= '            $selector->where([\'' . $this->primaryKey . '\' => [\'!=\', $data[\'' . $this->primaryKey . '\']]]);' . PHP_EOL;
             $checkUnique .= '        }' . PHP_EOL;
