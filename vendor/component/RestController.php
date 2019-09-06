@@ -7,24 +7,22 @@ class RestController extends \Controller
 
     public $table = null;
 
+    //列表
     public function indexAction()
     {
         try {
             if (!\App::$request->isGet()) {
                 throw new \Exception('bad request');
             }
-            if (isset(\App::$request->params['id']) && \App::$request->params['id']) {
-                $res = $this->findModel(\App::$request->params['id']);
-            } else {
-                $primaryKey = \Db::table($this->table)->getPrimaryKey();
-                $res = \Db::table($this->table)->order($primaryKey . ' desc')->limit($this->getLimit())->findAll();
-            }
+            $primaryKey = \Db::table($this->table)->getPrimaryKey();
+            $res = \Db::table($this->table)->order($primaryKey . ' desc')->limit($this->getLimit())->findAll();
             $this->success('获取成功', $res);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
     }
 
+    //创建
     public function createAction()
     {
         try {
@@ -39,10 +37,11 @@ class RestController extends \Controller
         }
     }
 
+    //更新
     public function updateAction()
     {
         try {
-            if (!\App::$request->isPut()) {
+            if (!\App::$request->isPost()) {
                 throw new \Exception('bad request');
             }
             $params = \App::$request->params;
@@ -59,18 +58,33 @@ class RestController extends \Controller
         }
     }
 
+    //详情
+    public function viewAction()
+    {
+        try {
+            if (!\App::$request->isGet()) {
+                throw new \Exception('bad request');
+            }
+            $res = $this->findModel(\App::$request->params['id']);
+            $this->success('获取成功', $res);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    //删除
     public function deleteAction()
     {
         try {
-            if (!\App::$request->isDelete()) {
+            if (!\App::$request->isPost()) {
                 throw new \Exception('bad request');
             }
             $params = \App::$request->params;
             if (!isset($params['id']) || !(int)$params['id']) {
                 throw new \Exception('bad request');
             }
-            $this->findModel($params['id']);
-            \Db::table($this->table)->delete(['id' => $params['id']]);
+            $primaryKey = \Db::table($this->table)->getPrimaryKey();
+            \Db::table($this->table)->delete([$primaryKey => $params['id']]);
             $this->success();
         } catch (\Exception $e) {
             $this->error($e->getMessage());

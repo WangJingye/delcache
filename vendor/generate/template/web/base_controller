@@ -1,0 +1,10 @@
+<?php
+
+namespace {{app}}\common\controller;
+
+use component\WebController;
+
+class BaseController extends WebController
+{
+
+}

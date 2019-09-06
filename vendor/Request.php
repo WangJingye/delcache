@@ -41,8 +41,10 @@ class Request
         }
         unset($_GET['s']);
         unset($_REQUEST['s']);
-        if (in_array($this->module, $this->config['deny_module_list'])) {
-            throw new \Exception('module is deny', 404);
+        if ($this->uri != $this->defaultUri) {
+            if (in_array($this->module, $this->config['deny_module_list'])) {
+                throw new \Exception('module is deny', 404);
+            }
         }
         $this->params = $this->trimString($_REQUEST);
     }
@@ -68,50 +70,32 @@ class Request
     {
         $route = $uri ? explode('/', $uri) : [];
         $config = $this->config;
+
         if (!$config) {
             $config = \App::$config->instance;
             $this->defaultUri = $config['default_module'] . '/' . $config['default_controller'] . '/' . $config['default_action'];
             $this->config = $config;
         }
         $params = [];
-        $action = $config['default_action'];
-        $controller = $config['default_controller'];
-        $module = $config['default_module'];
-        if (count($route) == 1) {
-            throw new Exception('page not found');
-        }
-        if (count($route) >= 2) {
+        if (count($route) == 0) {
+            $action = $config['default_action'];
+            $controller = $config['default_controller'];
+            $module = $config['default_module'];
+        } else if (count($route) == 1 && $route[0] == 'generate') {
+            $action = 'generate';
+            $controller = null;
+            $module = null;
+        } else if (count($route) < 3) {
+            throw new Exception('Page not found');
+        } else {
             $module = $route[0];
             $controller = $route[1];
-        }
-        $this->controllerNamespace = $this->getControllerNamespace($controller, $module);
-        if (get_parent_class($this->controllerNamespace) == 'component\RestController') {
-            switch ($this->method()) {
-                case 'GET':
-                    $action = 'index';
-                    break;
-                case 'POST':
-                    $action = 'create';
-                    break;
-                case 'PUT':
-                    $action = 'update';
-                    break;
-                case 'DELETE':
-                    $action = 'delete';
-                    break;
-            }
-            if (count($route) >= 3) {
-                $params['id'] = $route[2];
-            }
-        } else if (count($route) == 2) {
-            throw new Exception('page not found');
-        } else if (count($route) >= 3) {
             $action = $route[2];
         }
+        $this->controllerNamespace = $this->getControllerNamespace($controller, $module);
         for ($i = 3; $i < count($route); $i += 2) {
             $params[$route[$i]] = isset($route[$i + 1]) ? $route[$i + 1] : '';
         }
-
         return [
             'module' => $module,
             'controller' => $controller,

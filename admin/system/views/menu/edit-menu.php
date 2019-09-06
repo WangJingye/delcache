@@ -39,7 +39,7 @@
         <label class="col-sm-4 text-nowrap col-form-label form-label">图标样式</label>
         <div class="col-sm-8">
             <input type="text" name="icon" class="form-control"
-                   value="<?= isset($this->model['icon']) ? $this->model['icon'] : '' ?>"
+                   value="<?= isset($this->model['icon']) ? $this->model['icon'] : 'glyphicon glyphicon-bookmark' ?>"
                    placeholder="glyphicon glyphicon-bookmark">
         </div>
     </div>

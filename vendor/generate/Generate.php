@@ -5,17 +5,17 @@ namespace generate;
 
 class Generate
 {
-    private $table;
-    private $controllerUrl;
-    private $module;
-    private $theme;
-    private $primaryKey;
-    private $option;
-    private $app;
-    private $columnTypes;
-    private $uniqueColumns = [];
-    private $templatePath = '';
-    private static $instance;
+    public $table;
+    public $controllerUrl;
+    public $module;
+    public $theme;
+    public $primaryKey;
+    public $option;
+    public $app;
+    public $columnTypes;
+    public $uniqueColumns = [];
+    public $templatePath = '';
+    public static $instance;
 
     /**
      * Generate constructor.
@@ -28,8 +28,7 @@ class Generate
     {
         $this->theme = $option['template'];
         $this->templatePath = dirname(__FILE__) . '/template/' . $this->theme . '/';
-
-        $this->app = $option['app'];
+        $this->app = $this->theme == 'api' ? 'api' : 'admin';
         $this->table = ucfirst($option['table']);
         $this->module = $option['module'];
         $this->controllerUrl = strtolower(trim(preg_replace('/([A-Z])/', '-$1', $this->table), '-'));
@@ -104,6 +103,13 @@ class Generate
             $str = str_replace('{{app}}', $this->app, $str);
             file_put_contents($filename, $str);
         }
+        $filename = $dir . '/controller/BaseController.php';
+        if (!file_exists($filename)) {
+            $file = $this->templatePath . 'base_controller';
+            $str = file_get_contents($file);
+            $str = str_replace('{{app}}', $this->app, $str);
+            file_put_contents($filename, $str);
+        }
 
         $filename = $dir . '/config/config.php';
         if (!file_exists($filename)) {
@@ -121,9 +127,15 @@ class Generate
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
-        $dirList = [
-            'service', 'controller', 'config', 'views'
-        ];
+        if ($this->app == 'admin') {
+            $dirList = [
+                'service', 'controller', 'config', 'views'
+            ];
+        } else {
+            $dirList = [
+                'service', 'controller', 'config'
+            ];
+        }
         foreach ($dirList as $v) {
             if (!file_exists($dir . '/' . $v)) {
                 mkdir($dir . '/' . $v, 0755, true);
@@ -236,6 +248,15 @@ class Generate
         $str = str_replace('{{tablename}}', $this->option['name'], $str);
         if (!file_exists($filename)) {
             file_put_contents($filename, $str);
+        }
+        $filename = BASE_PATH . $this->app . '/common/controller/HomeController.php';
+        $file = $this->templatePath . 'home_controller';
+        if(file_exists($file)) {
+            $str = file_get_contents($file);
+            $str = str_replace('{{app}}', $this->app, $str);
+            if (!file_exists($filename)) {
+                file_put_contents($filename, $str);
+            }
         }
         return $this;
     }
@@ -422,7 +443,7 @@ class Generate
         return $this;
     }
 
-    private function getChooseList($field)
+    public function getChooseList($field)
     {
         if (isset($this->option['fchoice'][$field])) {
             if ($this->option['fchoice'][$field] == 1) {
@@ -441,7 +462,8 @@ class Generate
 //                foreach ($wheres as $v){
 //                    explode('',$v)
 //                }
-                $res = ['type' => 2,
+                $res = [
+                    'type' => 2,
                     'variable' => $arr[3],
                     'table' => $arr[0],
                     'key' => $arr[1],

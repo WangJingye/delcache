@@ -11,17 +11,7 @@ class Config
     {
         $file = COMMON_PATH . 'config/config.php';
         $this->load($file);
-        $instance = $this->instance[APP];
-        if (!$instance['default_module']) {
-            $instance['default_module'] = 'admin';
-        }
-        if (!$instance['default_action']) {
-            $instance['default_action'] = 'index';
-        }
-        if (!$instance['default_controller']) {
-            $instance['default_controller'] = 'index';
-        }
-        $this->instance = $instance;
+        $this->instance = $this->instance[APP];
     }
 
     /**

@@ -2,7 +2,8 @@
 
 namespace {{app}}\common\service;
 
-class BaseService extends \Service
+use component\WebService;
+class BaseService extends WebService
 {
     public $page = 1;
 

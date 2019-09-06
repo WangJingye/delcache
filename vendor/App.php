@@ -37,7 +37,7 @@ class App
             $request = Request::instance();
             $request->parseParams();
             self::$request = $request;
-            if ($request->controller == 'generate' && $request->module == self::$config->default_module) {
+            if ($request->action == 'generate' && $request->controller == null) {
                 self::generateHtml();
                 exit;
             }
@@ -62,9 +62,9 @@ class App
                 throw new \Exception('Action is not exist', 404);
             }
             //执行action
-            $controller->beforeAction();
+            $controller->before();
             $controller->$action();
-            $controller->afterAction();
+            $controller->after();
 
         } catch (\Exception $e) {
             $errorCode = $e->getCode();
