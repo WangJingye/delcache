@@ -21,10 +21,9 @@ class {{table}}Controller extends BaseController
      */
     public function indexAction()
     {
+        $params = \App::$request->params;
         $params['page'] = \App::$request->getParams('page', 1);
-        $params['pageSize'] = \App::$request->getParams('pageSize', 10);{{searchParams}}
-        $params['search_type'] = \App::$request->getParams('search_type');
-        $params['search_value'] = \App::$request->getParams('search_value');
+        $params['pageSize'] = \App::$request->getParams('pageSize', 10);
         if (!empty($params['search_type'])) {
             $params[$params['search_type']] = $params['search_value'];
         }
@@ -42,7 +41,7 @@ class {{table}}Controller extends BaseController
     {
         $params = \App::$request->params;
         if (\App::$request->isAjax() && \App::$request->isPost()) {
-            try {
+            try {{{parseFile}}
                 $this->{{mtable}}Service->save{{table}}($params);
                 $this->success('保存成功');
             } catch (\Exception $e) {

@@ -1,10 +1,8 @@
 <?php
 
-class Controller
+class Controller extends ObjectAccess
 {
     /** @var Controller $this */
-
-    protected $variation = [];
 
     public function init()
     {
@@ -30,17 +28,7 @@ class Controller
         $this->$key = $value;
     }
 
-    public function __set($name, $value)
-    {
-        if (trim($name) != '') {
-            $this->variation[$name] = $value;
-        }
-    }
 
-    public function __get($name)
-    {
-        return isset($this->variation[$name]) ? $this->variation[$name] : '';
-    }
 
     public function success($message = '', $data = [])
     {

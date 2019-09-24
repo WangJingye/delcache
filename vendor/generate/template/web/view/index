@@ -23,15 +23,13 @@
 <div class="table-responsive">
     <table class="table table-bordered list-table text-nowrap">
         <thead>
-        <tr>
-{{table-header}}
+        <tr>{{table-header}}
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($this->list as $v): ?>
-            <tr>
-{{table-body}}
+            <tr>{{table-body}}
                 <td>
                     <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}', ['{{primaryKey}}' => $v['{{primaryKey}}']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>

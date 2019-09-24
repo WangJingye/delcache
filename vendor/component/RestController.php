@@ -7,6 +7,30 @@ class RestController extends \Controller
 
     public $table = null;
 
+    public $actions = [
+        'index',
+        'create',
+        'update',
+        'delete'
+    ];
+
+    /**
+     * $filter有值时使用当前值进行数据过滤，否则不进行
+     * @var bool
+     */
+    public $filter = false;
+
+    public function init()
+    {
+        if ($this->filter) {
+            \App::$request->params->load([$this->filter => \App::$user['id']]);
+        }
+        if (!in_array(\App::$request->action, $this->actions)) {
+            throw new \Exception('404 NOT FOUND');
+        }
+        parent::init();
+    }
+
     //列表
     public function indexAction()
     {
@@ -14,8 +38,17 @@ class RestController extends \Controller
             if (!\App::$request->isGet()) {
                 throw new \Exception('bad request');
             }
-            $primaryKey = \Db::table($this->table)->getPrimaryKey();
-            $res = \Db::table($this->table)->order($primaryKey . ' desc')->limit($this->getLimit())->findAll();
+            $params = \App::$request->params;
+            $selector = \Db::table($this->table);
+            $primaryKey = $selector->getPrimaryKey();
+            $fields = $selector->getFields();
+            foreach ($params as $key => $value) {
+                if (isset($fields[$key])) {
+                    $selector->where([$key => $value]);
+                }
+            }
+            $res = $selector->order($primaryKey . ' desc')
+                ->limit($this->getLimit())->findAll();
             $this->success('获取成功', $res);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
@@ -65,8 +98,13 @@ class RestController extends \Controller
             if (!\App::$request->isGet()) {
                 throw new \Exception('bad request');
             }
-            $res = $this->findModel(\App::$request->params['id']);
-            $this->success('获取成功', $res);
+            $model = $this->findModel(\App::$request->params['id']);
+            if ($this->filter) {
+                if ($model[$this->filter] != \App::$user['id']) {
+                    throw new \Exception('数据有误');
+                }
+            }
+            $this->success('获取成功', $model);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
@@ -84,7 +122,13 @@ class RestController extends \Controller
                 throw new \Exception('bad request');
             }
             $primaryKey = \Db::table($this->table)->getPrimaryKey();
-            \Db::table($this->table)->delete([$primaryKey => $params['id']]);
+            $model = $this->findModel(\App::$request->params['id']);
+            if ($this->filter) {
+                if ($model[$this->filter] != \App::$user['id']) {
+                    throw new \Exception('数据有误');
+                }
+            }
+            \Db::table($this->table)->delete([$model[$primaryKey] => $params['id']]);
             $this->success();
         } catch (\Exception $e) {
             $this->error($e->getMessage());

@@ -2,7 +2,7 @@
 
 use component\DataBase;
 
-class Db
+class Db extends ObjectAccess
 {
     private $db;
     private $condition = '';

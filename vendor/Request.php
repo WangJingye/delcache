@@ -1,12 +1,16 @@
 <?php
 
-class Request
+class Request extends ObjectAccess
 {
     public $action;
     public $controller;
     public $module;
     public $config;
+
+    /** @var \Params $params */
     public $params;
+
+    public $header;
 
     public $controllerNamespace;//控制器命名空间
     public $uri;
@@ -21,7 +25,7 @@ class Request
      */
     public function __construct()
     {
-
+        $this->getHead();
     }
 
     /**
@@ -46,7 +50,9 @@ class Request
                 throw new \Exception('module is deny', 404);
             }
         }
-        $this->params = $this->trimString($_REQUEST);
+        $params = new \Params();
+        $params->load($_REQUEST);
+        $this->params = $this->trimString($params);
     }
 
     /**
@@ -217,6 +223,21 @@ class Request
             return $default;
         }
         return '';
+    }
+
+    /**
+     * @return array
+     */
+    private function getHead()
+    {
+        $headers = [];
+        foreach ($_SERVER as $key => $value) {
+            if ('HTTP_' == substr($key, 0, 5)) {
+                $headers[strtolower(str_replace('_', '-', substr($key, 5)))] = $value;
+            }
+        }
+        $this->header = $headers;
+
     }
 
     protected function trimString($params)

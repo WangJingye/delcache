@@ -321,3 +321,20 @@ h3 {
     align-items: center;
     display: flex;
 }
+
+
+input::-webkit-input-placeholder{
+    color:#aaa!important;
+}
+input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+    color:#aaa!important;
+
+}
+input:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+    color:#aaa!important;
+
+}
+input:-ms-input-placeholder{  /* Internet Explorer 10-11 */
+    color: #aaa !important;
+
+}

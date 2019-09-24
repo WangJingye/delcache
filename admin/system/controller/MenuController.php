@@ -21,15 +21,12 @@ class MenuController extends BaseController
      */
     public function indexAction()
     {
+        $params = \App::$request->params;
         $params['page'] = \App::$request->getParams('page', 1);
         $params['pageSize'] = \App::$request->getParams('pageSize', 10);
-        $params['status'] = \App::$request->getParams('status');
-        $params['search_type'] = \App::$request->getParams('search_type');
-        $params['search_value'] = \App::$request->getParams('search_value');
         if (!empty($params['search_type'])) {
             $params[$params['search_type']] = $params['search_value'];
-        }
-        /** @var MenuService $res */
+        }  /** @var MenuService $res */
         $res = $this->menuService->getList($params);
         $this->assign('params', $params);
         $this->assign('pagination', $this->pagination($res));

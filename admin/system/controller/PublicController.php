@@ -6,7 +6,6 @@ use admin\common\controller\BaseController;
 use admin\system\service\AdminService;
 use common\extend\captcha\Captcha;
 use common\extend\encrypt\Encrypt;
-use generate\Generate;
 
 class PublicController extends BaseController
 {
@@ -56,6 +55,6 @@ class PublicController extends BaseController
 
     public function captchaAction()
     {
-        (new Captcha())->generate();
+        (new Captcha())->createCheckCode()->showImage();
     }
 }

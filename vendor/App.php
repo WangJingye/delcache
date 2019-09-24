@@ -4,7 +4,7 @@ use component\Config;
 use component\Session;
 use component\UrlManager;
 
-class App
+class App extends ObjectAccess
 {
     /** @var \Request $request */
     public static $request;
@@ -15,7 +15,7 @@ class App
     /** @var UrlManager $urlManager */
     public static $urlManager;
 
-    /** @var Config */
+    /** @var Config $config*/
     public static $config;
 
     /** @var Session $session */

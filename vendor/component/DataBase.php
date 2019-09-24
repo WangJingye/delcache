@@ -2,7 +2,7 @@
 
 namespace component;
 
-class DataBase
+class DataBase extends \ObjectAccess
 {
     public static $instance;
 

@@ -2,7 +2,7 @@
 
 namespace component;
 
-class UrlManager
+class UrlManager extends \ObjectAccess
 {
     public function createUrl($uri, $option = [])
     {

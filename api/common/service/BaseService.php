@@ -1,6 +1,6 @@
 <?php
 
-namespace {{app}}\common\service;
+namespace api\common\service;
 
 use component\RestService;
 

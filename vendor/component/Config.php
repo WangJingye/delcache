@@ -2,7 +2,7 @@
 
 namespace component;
 
-class Config
+class Config extends \ObjectAccess
 {
     public $instance = [];
 
@@ -37,12 +37,10 @@ class Config
 
     public function load($file)
     {
-
         if (is_file($file)) {
             $instance = include $file;
             $this->instance = array_merge($this->instance, $instance);
         }
         return $this->instance;
     }
-
 }

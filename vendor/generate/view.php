@@ -45,7 +45,7 @@
         <div class="form-group">
             <div style="color:red">请填充字段数据</div>
         </div>
-    <?php endif;?>
+    <?php endif; ?>
     <?php if (isset($data['fcomment'])): ?>
         <div class="form-group" id="show-table-form-group">
             <div>选项输入格式variable,key:value，数据库格式table:key:value:variable:where</div>
@@ -67,7 +67,11 @@
                         <td class="fcomment"><input type="text" name="fcomment[<?= $field ?>]" class="form-control"
                                                     value="<?= $label ?>"></td>
                         <td class="ftype">
-                            <?php $ftypeList = ['input', 'select', 'radio', 'checkbox', 'textarea', 'date', 'datetime']; ?>
+                            <?php $ftypeList = [
+                                'input' => 'input', 'radio' => 'radio', 'checkbox' => 'checkbox',
+                                'select' => 'select', 'textarea' => 'textarea', 'date' => 'date',
+                                'date-normal' => 'date(文本)', 'datetime' => 'datetime', 'datetime-normal' => 'datetime(文本)'
+                                , 'image',]; ?>
                             <select class="form-control" name="ftype[<?= $field ?>]">
                                 <?php foreach ($ftypeList as $ftype): ?>
                                     <option value="<?= $ftype ?>" <?= $data['ftype'][$field] == $ftype ? 'selected' : '' ?>><?= $ftype ?></option>
@@ -86,19 +90,24 @@
                                    placeholder="">
                         </td>
                         <td class="fpagesearch1 fclick">
-                            <input type="checkbox" name="fpagesearch1[<?= $field ?>]" value="1" <?= isset($data['fpagesearch1'][$field]) && $data['fpagesearch1'][$field] == '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="fpagesearch1[<?= $field ?>]"
+                                   value="1" <?= isset($data['fpagesearch1'][$field]) && $data['fpagesearch1'][$field] == '1' ? 'checked' : '' ?>>
                         </td>
                         <td class="fpagesearch2 fclick">
-                            <input type="checkbox" name="fpagesearch2[<?= $field ?>]" value="1" <?= isset($data['fpagesearch2'][$field]) && $data['fpagesearch2'][$field] == '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="fpagesearch2[<?= $field ?>]"
+                                   value="1" <?= isset($data['fpagesearch2'][$field]) && $data['fpagesearch2'][$field] == '1' ? 'checked' : '' ?>>
                         </td>
                         <td class="fpageshow fclick">
-                            <input type="checkbox" name="fpageshow[<?= $field ?>]" value="1" <?= isset($data['fpageshow'][$field]) && $data['fpageshow'][$field] == '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="fpageshow[<?= $field ?>]"
+                                   value="1" <?= isset($data['fpageshow'][$field]) && $data['fpageshow'][$field] == '1' ? 'checked' : '' ?>>
                         </td>
                         <td class="feditshow fclick">
-                            <input type="checkbox" name="feditshow[<?= $field ?>]" value="1" <?= isset($data['feditshow'][$field]) && $data['feditshow'][$field] == '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="feditshow[<?= $field ?>]"
+                                   value="1" <?= isset($data['feditshow'][$field]) && $data['feditshow'][$field] == '1' ? 'checked' : '' ?>>
                         </td>
                         <td class="frequire fclick">
-                            <input type="checkbox" name="frequire[<?= $field ?>]" value="1" <?= isset($data['frequire'][$field]) && $data['frequire'][$field] == '1' ? 'checked' : '' ?>>
+                            <input type="checkbox" name="frequire[<?= $field ?>]"
+                                   value="1" <?= isset($data['frequire'][$field]) && $data['frequire'][$field] == '1' ? 'checked' : '' ?>>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -134,7 +143,10 @@
                     <option value="select">select</option>
                     <option value="textarea">textarea</option>
                     <option value="date">date</option>
+                    <option value="date-normal">date(文本)</option>
                     <option value="datetime">datetime</option>
+                    <option value="datetime-normal">datetime(文本)</option>
+                    <option value="image">image</option>
                 </select>
             </td>
             <td class="fchoice">

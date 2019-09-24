@@ -2,7 +2,6 @@
 
 namespace component;
 
-
 class WebService extends \Service
 {
     public $page = 1;

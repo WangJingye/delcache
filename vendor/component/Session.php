@@ -2,7 +2,7 @@
 
 namespace component;
 
-class Session
+class Session extends \ObjectAccess
 {
     public function set($name, $value = null, $expire = null)
     {

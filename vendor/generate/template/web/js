@@ -1,10 +1,8 @@
 $(function () {
     $('#save-form').validate({
-        rules: {
-{{rules}}
+        rules: {{{rules}}
         },
-        messages: {
-{{rulesMessage}}
+        messages: {{{rulesMessage}}
         },
         errorClass: "invalid-feedback",
         errorElement: "div",
