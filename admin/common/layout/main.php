@@ -78,12 +78,15 @@ foreach ($arr as $v) {
     </div>
     <div class="col-12 col-md-9 col-xl-10 bd-content" style="padding: 0">
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb" style="border-radius: 0;margin-bottom: 0;">
+            <ol class="breadcrumb" style="border-radius: 0;margin-bottom: 0;padding: 0.5rem">
                 <li class="breadcrumb-item">
                     <a href="<?= \App::$urlManager->createUrl('/') ?>">
                         <i class="glyphicon glyphicon-home"></i> 主页</a>
                 </li>
-                <?php foreach ($breadcrumbs as $v): ?>
+                <?php foreach ($breadcrumbs as $key => $v): ?>
+                    <?php if ($key == count($breadcrumbs) - 1) {
+                        $v['url'] = '';
+                    } ?>
                     <li class="breadcrumb-item <?= $v['url'] == '' ? 'active' : '' ?>">
                         <a <?= $v['url'] != '' ? 'href="' . \App::$urlManager->createUrl($v['url']) . '"' : ''; ?>><?= $v['name'] ?></a>
                     </li>

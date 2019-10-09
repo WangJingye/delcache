@@ -26,7 +26,8 @@ class MenuController extends BaseController
         $params['pageSize'] = \App::$request->getParams('pageSize', 10);
         if (!empty($params['search_type'])) {
             $params[$params['search_type']] = $params['search_value'];
-        }  /** @var MenuService $res */
+        }
+        /** @var MenuService $res */
         $res = $this->menuService->getList($params);
         $this->assign('params', $params);
         $this->assign('pagination', $this->pagination($res));
@@ -53,8 +54,10 @@ class MenuController extends BaseController
             if (!$model) {
                 throw new \Exception('菜单不存在');
             }
+            $this->title = '编辑菜单-' . $model['id'];
             $this->assign('model', $model);
         } else {
+            $this->title = '创建菜单';
             $params['id'] = 0;
         }
         $childList = $this->menuService->getChildMenus();

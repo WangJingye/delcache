@@ -50,11 +50,13 @@ class RoleController extends BaseController
             }
 
         }
+        $this->title = '创建角色';
         if ($id != 0) {
             $model = \Db::table('Role')->where(['id' => $params['id']])->find();
             if (!$model) {
                 throw new \Exception('角色不存在');
             }
+            $this->title = '编辑角色-' . $model['id'];
             $this->assign('model', $model);
         }
     }

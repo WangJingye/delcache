@@ -7,7 +7,7 @@ class UrlManager extends \ObjectAccess
     public function createUrl($uri, $option = [])
     {
         if ($uri == '/') {
-            $url = \App::$request->defaultUri;
+            $url = '/' . trim(\App::$request->defaultUri, '/');
         } else {
             $res = \App::$request->parseUri($uri);
             $option = array_merge($res['params'], $option);

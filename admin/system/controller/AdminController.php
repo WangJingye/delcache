@@ -53,11 +53,13 @@ class AdminController extends BaseController
                 $this->error($e->getMessage());
             }
         }
+        $this->title = '创建账号';
         if (isset($params['admin_id']) && $params['admin_id']) {
             $model = \Db::table('Admin')->where(['admin_id' => $params['admin_id']])->find();
             if (!$model) {
                 throw new \Exception('账号不存在');
             }
+            $this->title = '编辑账号-' . $model['admin_id'];
             $this->assign('model', $model);
         }
     }
