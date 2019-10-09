@@ -47,9 +47,11 @@ function saveForm() {
     for (var i in data) {
         formData.append(data[i].name, data[i].value);
     }
-    if (form.find('input[type=file]').get(0)) {
-        formData.append('file',form.find('input[type=file]')[0].files[0]);
-    }
+    form.find('input[type=file]').each(function () {
+        if($(this).val().length) {
+            formData.append($(this).attr('name'), $(this)[0].files[0]);
+        }
+    });
     toastr.loading('show');
     $.ajax({
         url: form.attr('action'),

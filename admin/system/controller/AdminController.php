@@ -40,7 +40,7 @@ class AdminController extends BaseController
      */
     public function editAdminAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 if (!empty($_FILES['file'])) {
@@ -70,7 +70,7 @@ class AdminController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $data = \App::$request->params;
+                $data = \App::$request->params->toArray();
                 \Db::table('Admin')->where(['admin_id' => $data['id']])->update(['status' => $data['status']]);
                 $this->success('修改成功');
             } catch (\Exception $e) {
@@ -88,7 +88,7 @@ class AdminController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = \App::$request->params;
+                $params = \App::$request->params->toArray();
                 $user = \App::$user;
                 if ($user['password'] != Encrypt::encryptPassword($params['password'], $user['salt'])) {
                     throw new \Exception('当前登录密码有误～');
@@ -109,7 +109,7 @@ class AdminController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = \App::$request->params;
+                $params = \App::$request->params->toArray();
                 if (!empty($_FILES['file'])) {
                     $file = $_FILES['file'];
                     $params['avatar'] = $this->parseFile($file);
@@ -133,7 +133,7 @@ class AdminController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = \App::$request->params;
+                $params = \App::$request->params->toArray();
                 $user = \Db::table('Admin')->where(['admin_id' => $params['admin_id']])->find();
                 if (!$user) {
                     throw new \Exception('用户信息有误，请刷新重试');

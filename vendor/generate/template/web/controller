@@ -39,7 +39,7 @@ class {{table}}Controller extends BaseController
      */
     public function edit{{table}}Action()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {{{parseFile}}
                 $this->{{mtable}}Service->save{{table}}($params);
@@ -64,7 +64,7 @@ class {{table}}Controller extends BaseController
      */
     public function deleteAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 if (!isset($params['{{primaryKey}}']) || $params['{{primaryKey}}'] == '') {

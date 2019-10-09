@@ -71,10 +71,10 @@
                                 'input' => 'input', 'radio' => 'radio', 'checkbox' => 'checkbox',
                                 'select' => 'select', 'textarea' => 'textarea', 'date' => 'date',
                                 'date-normal' => 'date(文本)', 'datetime' => 'datetime', 'datetime-normal' => 'datetime(文本)'
-                                , 'image',]; ?>
+                                , 'image' => 'image',]; ?>
                             <select class="form-control" name="ftype[<?= $field ?>]">
-                                <?php foreach ($ftypeList as $ftype): ?>
-                                    <option value="<?= $ftype ?>" <?= $data['ftype'][$field] == $ftype ? 'selected' : '' ?>><?= $ftype ?></option>
+                                <?php foreach ($ftypeList as $x => $ftype): ?>
+                                    <option value="<?= $x ?>" <?= $data['ftype'][$field] == $x ? 'selected' : '' ?>><?= $ftype ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </td>

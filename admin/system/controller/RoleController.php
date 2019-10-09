@@ -39,7 +39,7 @@ class RoleController extends BaseController
      */
     public function editRoleAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         $id = (int)\App::$request->getParams('id', 0);
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
@@ -66,7 +66,7 @@ class RoleController extends BaseController
      */
     public function setRoleAdminAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 $this->roleService->setRoleAdmin($params);
@@ -94,7 +94,7 @@ class RoleController extends BaseController
      */
     public function setRoleMenuAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 $this->roleService->setRoleMenu($params);

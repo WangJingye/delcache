@@ -231,14 +231,15 @@ class MenuService extends BaseService
                 if ($v == '.' || $v == '..') {
                     continue;
                 }
-                if(strpos($v,'Controller')===false){
+                if (strpos($v, 'Controller') === false) {
                     continue;
                 }
                 $controller = str_replace('.php', '', $v);
                 $v = 'admin\\' . $module . '\\controller\\' . substr($v, 0, -4);
                 $methodList = get_class_methods($v);
-                foreach ($methodList as $method) {
-                    if(strpos($method,'Action')===false){
+
+                foreach ((array)$methodList as $method) {
+                    if (strpos($method, 'Action') === false) {
                         continue;
                     }
                     $c = strtolower(trim(preg_replace('/([A-Z])/', '-$1', substr($controller, 0, -10)), '-'));

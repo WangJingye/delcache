@@ -355,8 +355,7 @@ class Generate extends \ObjectAccess
                 }
             } else if ($this->option['ftype'][$field] == 'image') {
                 $parseFile .= PHP_EOL . '                if (!empty($_FILES[\'' . $field . '\'])) {';
-                $parseFile .= PHP_EOL . '                    $file = $_FILES[\'' . $field . '\'];';
-                $parseFile .= PHP_EOL . '                    $params[\'' . $field . '\'] = $this->parseFile($file);';
+                $parseFile .= PHP_EOL . '                    $params[\'' . $field . '\'] = $this->parseFile($_FILES[\'' . $field . '\']);';
                 $parseFile .= PHP_EOL . '                }';
             }
         }

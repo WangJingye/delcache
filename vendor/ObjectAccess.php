@@ -139,4 +139,10 @@ class ObjectAccess implements ArrayAccess, Iterator
     {
         reset($this->data);
     }
+
+    public function toArray()
+    {
+        return $this->data;
+    }
+
 }

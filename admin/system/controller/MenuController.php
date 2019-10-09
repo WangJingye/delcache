@@ -38,7 +38,7 @@ class MenuController extends BaseController
      */
     public function editMenuAction()
     {
-        $params = \App::$request->params;
+        $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
                 $this->menuService->saveMenu($params);

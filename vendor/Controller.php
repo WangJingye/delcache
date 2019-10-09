@@ -29,7 +29,6 @@ class Controller extends ObjectAccess
     }
 
 
-
     public function success($message = '', $data = [])
     {
         $result = [
@@ -62,24 +61,25 @@ class Controller extends ObjectAccess
      * @return string
      * @throws \Exception
      */
-    public function parseFile($file, $is_image = true)
+    public function parseFile($file)
     {
-        $ext_arr = [];
-        if ($is_image) {
-            $ext_arr = ['gif', 'jpg', 'jpeg', 'png', 'bmp'];
-        }
+        $ext_arr = ['gif', 'jpg', 'jpeg', 'png', 'bmp'];
         $arr = explode('.', $file['name']);
         $ext = end($arr);
         if (!in_array($ext, $ext_arr)) {
             throw new \Exception('不允许的文件类型,只支持' . implode('/', $ext_arr));
         }
-        $filename = '/upload/system/image/' . md5_file($file['tmp_name']) . '.' . $ext;
-        if (!file_exists(PUBLIC_PATH . $filename)) {
-            if (@!move_uploaded_file($file['tmp_name'], PUBLIC_PATH . $filename)) {
+        $filePath = PUBLIC_PATH . '/upload/system/image/';
+        if (!file_exists($filePath)) {
+            mkdir($filePath, 0755, true);
+        }
+        $filename = md5_file($file['tmp_name']) . '.' . $ext;
+        if (!file_exists($filePath . $filename)) {
+            if (@!move_uploaded_file($file['tmp_name'], $filePath . $filename)) {
                 throw new \Exception('文件保存失败');
             }
         }
-        return $filename;
+        return '/upload/system/image/' . $filename;
     }
 
 }

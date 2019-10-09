@@ -22,7 +22,7 @@ class PublicController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = \App::$request->params;
+                $params = \App::$request->params->toArray();
                 if (!(new Captcha())->check($params['captcha'])) {
                     throw new \Exception('验证码不正确');
                 }

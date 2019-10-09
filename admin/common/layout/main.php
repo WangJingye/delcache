@@ -23,7 +23,7 @@ foreach ($arr as $v) {
     $breadcrumbs[] = $tmp;
 }
 ?>
-<header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar">
+<header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar" style="height: 3rem">
     <div class="col-3 col-md-3 col-xl-2">
         <ul class="navbar-nav">
             <li class="nav-item dropdown">
