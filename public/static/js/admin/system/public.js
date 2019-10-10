@@ -45,17 +45,17 @@ $(function () {
 function submitForm() {
     var form = $('#login-form');
     var data = form.serialize();
-    toastr.loading('show');
+    $.loading('show');
     $.post(form.attr('action'), data, function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message);
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message);
             setTimeout(function () {
                 location.href = '/';
             }, 2000)
         } else {
             $('.captcha-box').find('img').click();
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }

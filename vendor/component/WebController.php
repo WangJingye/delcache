@@ -13,7 +13,7 @@ class WebController extends \Controller
         '/static/plugin/bootstrap/js/bootstrap.js',
         '/static/js/jquery.validate.js',
         '/static/js/select2.min.js',
-        '/static/js/toastr.js',
+        '/static/js/popup.js',
         '/static/js/ztree.core.js',
         '/static/js/ztree.excheck.js',
         '/static/js/main.js',

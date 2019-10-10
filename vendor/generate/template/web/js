@@ -27,14 +27,14 @@ $(function () {
         let args = {
             {{primaryKey}}: $(this).data('{{primaryKey}}'),
         };
-        toastr.loading('show');
+        $.loading('show');
         $.post('/{{module}}/{{controllerUrl}}/delete', args, function (res) {
-            toastr.loading('hide');
-            if (res.code == 0) {
-                toastr.success(res.message);
+            $.loading('hide');
+            if (res.code == 200) {
+                $.success(res.message);
                 $this.parents('tr').remove();
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         }, 'json');
     });
@@ -52,7 +52,7 @@ function saveForm() {
             formData.append($(this).attr('name'), $(this)[0].files[0]);
         }
     });
-    toastr.loading('show');
+    $.loading('show');
     $.ajax({
         url: form.attr('action'),
         type: 'POST',
@@ -61,14 +61,14 @@ function saveForm() {
         contentType: false,
         processData: false,
         success: function (res) {
-            if (res.code == 0) {
-                toastr.success(res.message);
+            if (res.code == 200) {
+                $.success(res.message);
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         },
         complete: function () {
-            toastr.loading('hide');
+            $.loading('hide');
         }
     });
 }

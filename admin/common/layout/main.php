@@ -86,6 +86,9 @@ foreach ($arr as $v) {
                 <?php foreach ($breadcrumbs as $key => $v): ?>
                     <?php if ($key == count($breadcrumbs) - 1) {
                         $v['url'] = '';
+                        if ($this->title) {
+                            $v['name'] = $this->title;
+                        }
                     } ?>
                     <li class="breadcrumb-item <?= $v['url'] == '' ? 'active' : '' ?>">
                         <a <?= $v['url'] != '' ? 'href="' . \App::$urlManager->createUrl($v['url']) . '"' : ''; ?>><?= $v['name'] ?></a>

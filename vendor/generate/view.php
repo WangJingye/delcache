@@ -179,13 +179,13 @@
 <script src="/static/plugin/bootstrap/js/popper.min.js"></script>
 <script src="/static/plugin/bootstrap/js/bootstrap.js"></script>
 <script src="/static/js/jquery.validate.js"></script>
-<script src="/static/js/toastr.js"></script>
+<script src="/static/js/popup.js"></script>
 <script>
     $(function () {
         $('.show-table').click(function () {
             var $this = $(this);
             $.post('/generate', {type: 'show-table', table: $('input[name=table]').val()}, function (res) {
-                if (res.code == '0') {
+                if (res.code == 200) {
                     var html = ' <div>选项输入格式variable,key:value，数据库格式table:key:value:variable:where</div><table class="table table-bordered">';
                     html += $('#table-header').clone().html();
                     var data = res.data;

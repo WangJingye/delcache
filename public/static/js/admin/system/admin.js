@@ -119,15 +119,15 @@ $(function () {
             id: $(this).data('id'),
             status: $(this).data('status')
         };
-        toastr.loading('show');
+        $.loading('show');
         $.post('/system/admin/set-status', args, function (res) {
-            toastr.loading('hide');
-            if (res.code == 0) {
-                toastr.success(res.message, function () {
+            $.loading('hide');
+            if (res.code == 200) {
+                $.success(res.message, function () {
                     location.reload();
                 });
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         }, 'json');
     });
@@ -135,13 +135,13 @@ $(function () {
         if (!confirm('是否重置密码为' + $(this).data('default') + '?')) {
             return false;
         }
-        toastr.loading('show');
+        $.loading('show');
         $.post('/system/admin/reset-password', {admin_id: $(this).data('id')}, function (res) {
-            toastr.loading('hide');
-            if (res.code == 0) {
-                toastr.success(res.message);
+            $.loading('hide');
+            if (res.code == 200) {
+                $.success(res.message);
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         }, 'json');
     });
@@ -162,7 +162,7 @@ function saveForm() {
     if ($('input[type=file]').val().length) {
         formData.append('file', $('input[type=file]')[0].files[0]);
     }
-    toastr.loading('show');
+    $.loading('show');
     $.ajax({
         url: form.attr('action'),
         type: 'POST',
@@ -171,14 +171,14 @@ function saveForm() {
         contentType: false,
         processData: false,
         success: function (res) {
-            if (res.code == 0) {
-                toastr.success(res.message);
+            if (res.code == 200) {
+                $.success(res.message);
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         },
         complete: function () {
-            toastr.loading('hide');
+            $.loading('hide');
         }
     });
 }
@@ -193,7 +193,7 @@ function changeUserForm() {
     if ($('input[type=file]').val().length) {
         formData.append('file', $('input[type=file]')[0].files[0]);
     }
-    toastr.loading('show');
+    $.loading('show');
     $.ajax({
         url: form.attr('action'),
         type: 'POST',
@@ -202,16 +202,16 @@ function changeUserForm() {
         contentType: false,
         processData: false,
         success: function (res) {
-            if (res.code == 0) {
-                toastr.success(res.message, function () {
+            if (res.code == 200) {
+                $.success(res.message, function () {
                     location.reload();
                 }, 2000);
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         },
         complete: function () {
-            toastr.loading('hide');
+            $.loading('hide');
         }
     });
 }
@@ -219,13 +219,13 @@ function changeUserForm() {
 function changePasswordForm() {
     let form = $('#change-password-form');
     $.post(form.attr('action'), form.serialize(), function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message, function () {
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message, function () {
                 location.reload();
             }, 2000);
         } else {
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }

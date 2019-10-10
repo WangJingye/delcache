@@ -36,15 +36,15 @@ $(function () {
             id: $(this).data('id'),
             status: $(this).data('status')
         };
-        toastr.loading('show');
+        $.loading('show');
         $.post('/system/menu/set-status', args, function (res) {
-            toastr.loading('hide');
-            if (res.code == 0) {
-                toastr.success(res.message, function () {
+            $.loading('hide');
+            if (res.code == 200) {
+                $.success(res.message, function () {
                     location.reload();
                 });
             } else {
-                toastr.error(res.message);
+                $.error(res.message);
             }
         }, 'json');
     });
@@ -57,16 +57,16 @@ function saveForm() {
         type = form.find('[name=type]:checked').val();
 
     if ($.inArray(type, ['2', '3']) != -1 && !form.find('select[name=url]').val().length) {
-        toastr.error('左部功能/列表功能 必须选择 链接地址');
+        $.error('左部功能/列表功能 必须选择 链接地址');
         return false;
     }
-    toastr.loading('show');
+    $.loading('show');
     $.post(form.attr('action'), data, function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message);
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message);
         } else {
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }

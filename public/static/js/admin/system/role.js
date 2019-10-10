@@ -70,13 +70,13 @@ function getCheckTreeNodes(nodes) {
 function saveRoleAdminForm() {
     var form = $('#save-role-admin-form');
     var data = form.serialize();
-    toastr.loading('show');
+    $.loading('show');
     $.post(form.attr('action'), data, function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message);
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message);
         } else {
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }
@@ -88,13 +88,13 @@ function saveRoleMenuForm() {
     var form = $('#save-role-menu-form');
     $('input[name=menu_ids]').val(nodesArr.join(','));
     var data = form.serialize();
-    toastr.loading('show');
+    $.loading('show');
     $.post(form.attr('action'), data, function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message);
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message);
         } else {
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }
@@ -102,13 +102,13 @@ function saveRoleMenuForm() {
 function saveForm() {
     var form = $('#save-form');
     var data = form.serialize();
-    toastr.loading('show');
+    $.loading('show');
     $.post(form.attr('action'), data, function (res) {
-        toastr.loading('hide');
-        if (res.code == 0) {
-            toastr.success(res.message);
+        $.loading('hide');
+        if (res.code == 200) {
+            $.success(res.message);
         } else {
-            toastr.error(res.message);
+            $.error(res.message);
         }
     }, 'json');
 }

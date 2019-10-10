@@ -1,4 +1,4 @@
-var toastr = {
+jQuery.extend({
     count: 1,
     option: {
         'successClass': 'alert-success',
@@ -8,9 +8,9 @@ var toastr = {
         if (timeout == null) {
             timeout = 3000;
         }
-        var alertC = 'alert' + toastr.count;
-        toastr.count++;
-        var html = '<div class="alert ' + toastr.option.successClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
+        var alertC = 'alert' + this.count;
+        this.count++;
+        var html = '<div class="alert ' + this.option.successClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
             '<span>' + msg + '</span>' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
             '<span aria-hidden="true">×</span>' +
@@ -33,9 +33,9 @@ var toastr = {
         if (timeout == null) {
             timeout = 3000;
         }
-        var alertC = 'alert' + toastr.count;
-        toastr.count++;
-        var html = '<div class="alert ' + toastr.option.errorClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
+        var alertC = 'alert' + this.count;
+        this.count++;
+        var html = '<div class="alert ' + this.option.errorClass + ' alert-dismissible fade show ' + alertC + '" role="alert">' +
             '<span>' + msg + '</span>' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
             '<span aria-hidden="true">×</span>' +
@@ -88,4 +88,4 @@ var toastr = {
             }
         }
     }
-};
+});

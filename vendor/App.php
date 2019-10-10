@@ -15,7 +15,7 @@ class App extends ObjectAccess
     /** @var UrlManager $urlManager */
     public static $urlManager;
 
-    /** @var Config $config*/
+    /** @var Config $config */
     public static $config;
 
     /** @var Session $session */
@@ -53,13 +53,16 @@ class App extends ObjectAccess
             $action = implode('', $arr) . 'Action';
             $controller = $request->controllerNamespace;
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
-                throw new \Exception('Controller is not exist', 404);
+                $msg = APP_DEBUG ? 'Controller is not exist' : 'Page not found';
+                throw new \Exception($msg, 404);
+
             }
             /** @var Controller $controller */
             $controller = new $controller();
 
             if (!in_array($action, get_class_methods($controller))) {
-                throw new \Exception('Action is not exist', 404);
+                $msg = APP_DEBUG ? 'Action is not exist' : 'Page not found';
+                throw new \Exception($msg, 404);
             }
             //执行action
             $controller->before();
@@ -71,38 +74,38 @@ class App extends ObjectAccess
             if ($errorCode == 0) {
                 $errorCode = 500;
             }
+            if (APP == 'api') {
+                exit(json_encode(['code' => $errorCode, 'msg' => $e->getMessage(), 'data' => null]));
+            }
             header('status:' . $errorCode);
             $errorMsg = [
                 400 => '400 BAD REQUEST',
                 404 => '404 NOT FOUND',
                 500 => '500 Internal Server Error',
             ];
-            if (!APP_DEBUG) {
-                $view = COMMON_PATH . 'layout/' . $errorCode . '.php';
-                if (file_exists($view)) {
-                    include $view;
-                    exit();
-                }
-                $msg = $errorMsg[$errorCode];
-            } else {
+            if (APP_DEBUG) {
                 throw new \Exception($e->getMessage(), $e->getCode());
             }
-            echo $msg;
+            $view = COMMON_PATH . 'layout/' . $errorCode . '.php';
+            if (file_exists($view)) {
+                include $view;
+                exit();
+            }
+            echo $errorMsg[$errorCode];
         }
     }
 
     public static function generateHtml()
     {
-        $data = [];
         if (self::$request->isPost()) {
             $data = self::$request->params;
             if ($data['type'] == 'show-table') {
                 try {
                     $fields = Db::table($data['table'])->getFields();
-                    echo json_encode(['code' => '0', 'data' => array_keys($fields)]);
+                    echo json_encode(['code' => 200, 'data' => array_keys($fields)]);
 
                 } catch (Exception $e) {
-                    echo json_encode(['code' => '1', 'message' => $e->getMessage()]);
+                    echo json_encode(['code' => 400, 'message' => $e->getMessage()]);
                 }
                 die;
             } else {

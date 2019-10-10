@@ -92,7 +92,7 @@ class Request extends ObjectAccess
             $controller = null;
             $module = null;
         } else if (count($route) < 3) {
-            throw new Exception('Page not found');
+            throw new Exception('Page not found',404);
         } else {
             $module = $route[0];
             $controller = $route[1];

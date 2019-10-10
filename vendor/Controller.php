@@ -32,9 +32,9 @@ class Controller extends ObjectAccess
     public function success($message = '', $data = [])
     {
         $result = [
-            'code' => 0,
+            'code' => 200,
             'message' => $message,
-            'data' => $data,
+            'data' => empty($data) ? null : $data,
         ];
         exit(json_encode($result));
     }
@@ -46,7 +46,7 @@ class Controller extends ObjectAccess
     public function error($message = '', $data = [])
     {
         $result = [
-            'code' => 1,
+            'code' => 400,
             'message' => $message,
             'data' => $data,
         ];
