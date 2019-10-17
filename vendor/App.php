@@ -103,7 +103,6 @@ class App extends ObjectAccess
                 try {
                     $fields = Db::table($data['table'])->getFields();
                     echo json_encode(['code' => 200, 'data' => array_keys($fields)]);
-
                 } catch (Exception $e) {
                     echo json_encode(['code' => 400, 'message' => $e->getMessage()]);
                 }
