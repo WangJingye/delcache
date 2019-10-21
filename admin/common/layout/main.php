@@ -23,7 +23,7 @@ foreach ($arr as $v) {
     $breadcrumbs[] = $tmp;
 }
 ?>
-<header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar" style="height: 3rem">
+<header class="navbar navbar-expand-lg navbar-dark bg-primary bd-navbar">
     <div class="col-3 col-md-3 col-xl-2">
         <ul class="navbar-nav">
             <li class="nav-item dropdown">
@@ -44,7 +44,7 @@ foreach ($arr as $v) {
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="top-menu-list">
+    <div class="collapse navbar-collapse" id="top-menu-list" style="text-align: center">
         <div class="navbar-nav">
             <?php foreach ($topList as $v): ?>
                 <a class="nav-item nav-link <?= isset($activeMenuList[$v['id']]) ? 'active' : '' ?>"
