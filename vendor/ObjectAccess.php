@@ -145,4 +145,16 @@ class ObjectAccess implements ArrayAccess, Iterator
         return $this->data;
     }
 
+    public function uuid($len, $radix)
+    {
+        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        $uuid = [];
+
+        for ($i = 0; $i < $len; $i++) {
+            $uuid[$i] = $chars[rand(0, $radix)];
+        }
+        return implode('', $uuid);
+
+    }
+
 }

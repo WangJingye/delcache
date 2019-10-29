@@ -263,6 +263,32 @@ class Db extends ObjectAccess
         }
     }
 
+    public function increase($field, $number)
+    {
+        $condition = '';
+        if ($this->condition) {
+            $condition = ' where ' . $this->condition;
+        }
+        $sql = 'update ' . $this->table_name . ' set ' . '`' . $field . '`' . ' = `' . $field . '` + ' . $number . $condition;
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
+            throw new \Exception($error[2]);
+        }
+    }
+
+    public function decrease($field, $number)
+    {
+        $condition = '';
+        if ($this->condition) {
+            $condition = ' where ' . $this->condition;
+        }
+        $sql = 'update ' . $this->table_name . ' set ' . '`' . $field . '`' . ' = `' . $field . '` - ' . $number . $condition;
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
+            throw new \Exception($error[2]);
+        }
+    }
+
     /**
      * @param $data
      * @return string

@@ -61,25 +61,74 @@ class Controller extends ObjectAccess
      * @return string
      * @throws \Exception
      */
-    public function parseFile($file)
+    public function parseFile($file, $path = '/')
     {
         $ext_arr = ['gif', 'jpg', 'jpeg', 'png', 'bmp'];
-        $arr = explode('.', $file['name']);
-        $ext = end($arr);
-        if (!in_array($ext, $ext_arr)) {
-            throw new \Exception('不允许的文件类型,只支持' . implode('/', $ext_arr));
+        $fileList = $file['name'];
+        if (is_string($file['name'])) {
+            $fileList = [$file['name']];
         }
-        $filePath = PUBLIC_PATH . '/upload/system/image/';
-        if (!file_exists($filePath)) {
-            mkdir($filePath, 0755, true);
+        $tmpList = $file['tmp_name'];
+        if (is_string($file['tmp_name'])) {
+            $tmpList = [$file['tmp_name']];
         }
-        $filename = md5_file($file['tmp_name']) . '.' . $ext;
-        if (!file_exists($filePath . $filename)) {
-            if (@!move_uploaded_file($file['tmp_name'], $filePath . $filename)) {
-                throw new \Exception('文件保存失败');
+        $res = [];
+        $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
+        foreach ($fileList as $i => $f_name) {
+            if (!$f_name) {
+                continue;
             }
+            $arr = explode('.', $f_name);
+            $ext = end($arr);
+            if (!in_array($ext, $ext_arr)) {
+                throw new \Exception('不允许的文件类型,只支持' . implode('/', $ext_arr));
+            }
+            $filePath = PUBLIC_PATH . 'upload/' . $path;
+            if (!file_exists($filePath)) {
+                mkdir($filePath, 0755, true);
+            }
+            $filename = 'upload/' . $path . md5_file($tmpList[$i]) . '.' . $ext;
+            if (!file_exists(PUBLIC_PATH . $filename)) {
+                if (@!move_uploaded_file($tmpList[$i], PUBLIC_PATH . $filename)) {
+                    throw new \Exception('文件保存失败');
+                }
+            }
+            $res[] = App::$config->web_info['host'] . '/' . $filename;
         }
-        return '/upload/system/image/' . $filename;
+        return implode(',', $res);
     }
 
+    public function parseFileOrUrl($key, $path = '/')
+    {
+        $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
+        if (!empty($_FILES[$key])) {
+            return $this->parseFile($_FILES[$key], $path);
+        } else if ($urlList = \App::$request->params[$key]) {
+            if (!is_array($urlList)) {
+                $urlList = [$urlList];
+            }
+            $res = [];
+            $baseUrl = \App::$config->web_info['host'];
+            foreach ($urlList as $url) {
+                if (strpos($url, $baseUrl) !== 0) {
+                    throw new \Exception('文件格式有误');
+                }
+                $filename = str_replace($baseUrl . '/upload/common', '', $url);
+                $oldFilePath = PUBLIC_PATH . 'upload/common/';
+                $oldFilename = $oldFilePath . $filename;
+                $newFilePath = PUBLIC_PATH . 'upload/' . $path;
+                $newFilename = $newFilePath . $filename;
+                if (!file_exists($newFilePath)) {
+                    mkdir($newFilePath, 0755, true);
+                }
+                if (file_exists($oldFilename)) {
+                    copy($oldFilename, $newFilename);
+                    unlink($oldFilename);
+                }
+                $res[] = $baseUrl . '/upload/' . $path . $filename;
+            }
+            return implode(',', $res);
+        }
+        return '';
+    }
 }

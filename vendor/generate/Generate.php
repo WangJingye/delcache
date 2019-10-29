@@ -108,15 +108,15 @@ class Generate extends \ObjectAccess
                 continue;
             }
             if ($rules) {
-                $rules .= PHP_EOL.',';
-                $rulesMessage .= PHP_EOL.',';
+                $rules .= ',';
+                $rulesMessage .= ',';
             }
-            $rules .= PHP_EOL.'            ' . $field . ': {';
-            $rulesMessage .= PHP_EOL.'            ' . $field . ': {';
-            $rules .= PHP_EOL.'                required: true';;
-            $rulesMessage .= PHP_EOL.'                required: \'请输入' . $label . '\'';;
-            $rules .= PHP_EOL.'            }';
-            $rulesMessage .= PHP_EOL.'            }';
+            $rules .= PHP_EOL . '            ' . $field . ': {';
+            $rulesMessage .= PHP_EOL . '            ' . $field . ': {';
+            $rules .= PHP_EOL . '                required: true';;
+            $rulesMessage .= PHP_EOL . '                required: \'请输入' . $label . '\'';;
+            $rules .= PHP_EOL . '            }';
+            $rulesMessage .= PHP_EOL . '            }';
 
         }
         $filename = $dir . '/' . $this->controllerUrl . '.js';
@@ -164,7 +164,7 @@ class Generate extends \ObjectAccess
                 $inputParams .= PHP_EOL . '            <select name="' . $field . '" class="form-control">';
                 $inputParams .= PHP_EOL . '                <option value="">请选择</option>';
                 $inputParams .= PHP_EOL . '                <?php foreach ($this->' . $res['variable'] . ' as $key => $v): ?>';
-                $inputParams .= PHP_EOL . '                    <option value="<?= $key ?>" <?= isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $key ? \'selected\' : \'\' ?>><?= $v ?></option>';
+                $inputParams .= PHP_EOL . '                    <option value="<?= $key ?>" <?= $this->model[\'' . $field . '\'] == $key ? \'selected\' : \'\' ?>><?= $v ?></option>';
                 $inputParams .= PHP_EOL . '                <?php endforeach; ?>';
                 $inputParams .= PHP_EOL . '            </select>';
             } else if ($this->option['ftype'][$field] == 'radio') {
@@ -172,7 +172,7 @@ class Generate extends \ObjectAccess
                 $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
                 $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
                 $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="radio" name="' . $field . '"';
-                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $k) ? \'checked\' : \'\' ?>>';
+                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= $this->model[\'' . $field . '\'] == $k ? \'checked\' : \'\' ?>>';
                 $inputParams .= PHP_EOL . '                        <?= $v ?>';
                 $inputParams .= PHP_EOL . '                    </label>';
                 $inputParams .= PHP_EOL . '                </div>';
@@ -182,20 +182,20 @@ class Generate extends \ObjectAccess
                 $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
                 $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
                 $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="checkbox" name="' . $field . '"';
-                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] == $k) ? \'checked\' : \'\' ?>>';
+                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= $this->model[\'' . $field . '\'] == $k ? \'checked\' : \'\' ?>>';
                 $inputParams .= PHP_EOL . '                        <?= $v ?>';
                 $inputParams .= PHP_EOL . '                    </label>';
                 $inputParams .= PHP_EOL . '                </div>';
                 $inputParams .= PHP_EOL . '            <?php endforeach; ?>';
             } else if ($this->option['ftype'][$field] == 'textarea') {
-                $inputParams .= PHP_EOL . '            <textarea name="' . $field . '" class="form-control" placeholder="请输入' . $label . '"><?= isset($this->model[\'' . $field . '\']) ? $this->model[\'' . $field . '\'] : "" ?></textarea>';
+                $inputParams .= PHP_EOL . '            <textarea name="' . $field . '" class="form-control" placeholder="请输入' . $label . '"><?= $this->model[\'' . $field . '\'] ?></textarea>';
             } else if ($this->option['ftype'][$field] == 'image') {
                 $inputParams .= PHP_EOL . '            <div class="fileinput-box">';
                 $inputParams .= PHP_EOL . '                <?php if (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\']): ?>';
                 $inputParams .= PHP_EOL . '                    <img src="<?= $this->model[\'' . $field . '\'] ?>">';
                 $inputParams .= PHP_EOL . '                <?php endif; ?>';
                 $inputParams .= PHP_EOL . '                <div class="fileinput-button">';
-                $inputParams .= PHP_EOL . '                    <div class="plus-symbol" <?= isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\'] ? \'style="display:none"\' : \'\' ?>>';
+                $inputParams .= PHP_EOL . '                    <div class="plus-symbol" <?= $this->model[\'' . $field . '\'] ? \'style="display:none"\' : \'\' ?>>';
                 $inputParams .= PHP_EOL . '                        +';
                 $inputParams .= PHP_EOL . '                    </div>';
                 $inputParams .= PHP_EOL . '                    <input class="fileinput-input" type="file" name="' . $field . '" value="">';
@@ -207,7 +207,7 @@ class Generate extends \ObjectAccess
                 if (in_array($this->option['ftype'][$field], ['date', 'date-normal', 'datetime', 'datetime-normal'])) {
                     $placeholder = $label . '，格式为2019-01-01';
                 }
-                $inputParams .= PHP_EOL . '            <input type="text" name="' . $field . '" class="form-control" value="<?= isset($this->model[\'' . $field . '\']) ? $this->model[\'' . $field . '\'] : "" ?>" placeholder="' . $placeholder . '">';
+                $inputParams .= PHP_EOL . '            <input type="text" name="' . $field . '" class="form-control" value="<?= $this->model[\'' . $field . '\']?>" placeholder="' . $placeholder . '">';
             }
             $inputParams .= PHP_EOL . '        </div>';
             $inputParams .= PHP_EOL . '    </div>';
@@ -234,22 +234,22 @@ class Generate extends \ObjectAccess
         foreach ($this->option['fcomment'] as $field => $label) {
             $res = $this->getChooseList($field);
             if (isset($this->option['fpageshow'][$field]) && $this->option['fpageshow'][$field] == 1) {
-                $header .= PHP_EOL.'            <th>' . $label . '</th>';
+                $header .= PHP_EOL . '            <th>' . $label . '</th>';
                 if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
-                    $body .= PHP_EOL.'                <td><?= $this->' . $res['variable'] . '[$v[\'' . $field . '\']] ?></td>';
+                    $body .= PHP_EOL . '                <td><?= $this->' . $res['variable'] . '[$v[\'' . $field . '\']] ?></td>';
                 } else if ($this->option['ftype'][$field] == 'date') {
-                    $body .= PHP_EOL.'                <td><?= date(\'Y-m-d\', $v[\'' . $field . '\']) ?></td>';
+                    $body .= PHP_EOL . '                <td><?= date(\'Y-m-d\', $v[\'' . $field . '\']) ?></td>';
 
                 } else if ($this->option['ftype'][$field] == 'datetime') {
-                    $body .= PHP_EOL.'                <td><?= date(\'Y-m-d H:i:s\', $v[\'' . $field . '\']) ?></td>';
+                    $body .= PHP_EOL . '                <td><?= date(\'Y-m-d H:i:s\', $v[\'' . $field . '\']) ?></td>';
                 } else if ($this->option['ftype'][$field] == 'image') {
-                    $body .= PHP_EOL.'                <td>';
-                    $body .= PHP_EOL.'                    <?php if ($v[\'' . $field . '\']): ?>';
-                    $body .= PHP_EOL.'                        <img src="<?= $v[\'' . $field . '\'] ?>" style="width: 60px;height: 60px;">';
-                    $body .= PHP_EOL.'                    <?php endif; ?>';
-                    $body .= PHP_EOL.'                </td>';
+                    $body .= PHP_EOL . '                <td>';
+                    $body .= PHP_EOL . '                    <?php if ($v[\'' . $field . '\']): ?>';
+                    $body .= PHP_EOL . '                        <img src="<?= $v[\'' . $field . '\'] ?>" style="width: 60px;height: 60px;">';
+                    $body .= PHP_EOL . '                    <?php endif; ?>';
+                    $body .= PHP_EOL . '                </td>';
                 } else {
-                    $body .= PHP_EOL.'                <td><?= $v[\'' . $field . '\'] ?></td>';
+                    $body .= PHP_EOL . '                <td><?= $v[\'' . $field . '\'] ?></td>';
                 }
             }
             if (isset($this->option['fpagesearch1'][$field]) && $this->option['fpagesearch1'][$field] == 1) {
@@ -396,35 +396,35 @@ class Generate extends \ObjectAccess
         $str = file_get_contents($file);
         $selectorParams = '';
         foreach ($this->option['fcomment'] as $field => $label) {
-            $selectorParams .= PHP_EOL.'        if (isset($params[\'' . $field . '\']) && $params[\'' . $field . '\'] != \'\') {';
+            $selectorParams .= PHP_EOL . '        if (isset($params[\'' . $field . '\']) && $params[\'' . $field . '\'] != \'\') {';
             if ($this->columnTypes[$field] == 'string') {
                 $where = '[\'' . $field . '\' => [\'like\', \'%\' . $params[\'' . $field . '\'] . \'%\']]';
             } else {
                 $where = '[\'' . $field . '\' => $params[\'' . $field . '\']]';
             }
-            $selectorParams .= PHP_EOL.'            $selector->where(' . $where . ');';
-            $selectorParams .= PHP_EOL.'        }';
+            $selectorParams .= PHP_EOL . '            $selector->where(' . $where . ');';
+            $selectorParams .= PHP_EOL . '        }';
         }
         $checkUnique = '';
         if (count($this->uniqueColumns)) {
             $checkUnique .= PHP_EOL . '        $selector = \Db::table(\'' . $this->table . '\');';
-            $checkUnique .= PHP_EOL.'        if (isset($data[\'' . $this->primaryKey . '\']) && $data[\'' . $this->primaryKey . '\']) {';
-            $checkUnique .= PHP_EOL.'            $selector->where([\'' . $this->primaryKey . '\' => [\'!=\', $data[\'' . $this->primaryKey . '\']]]);';
-            $checkUnique .= PHP_EOL.'        }';
+            $checkUnique .= PHP_EOL . '        if (isset($data[\'' . $this->primaryKey . '\']) && $data[\'' . $this->primaryKey . '\']) {';
+            $checkUnique .= PHP_EOL . '            $selector->where([\'' . $this->primaryKey . '\' => [\'!=\', $data[\'' . $this->primaryKey . '\']]]);';
+            $checkUnique .= PHP_EOL . '        }';
             $message = [];
             foreach ($this->uniqueColumns as $key => $vList) {
-                $checkUnique .= PHP_EOL.'        $check = [];';
+                $checkUnique .= PHP_EOL . '        $check = [];';
                 foreach ($vList as $v) {
-                    $checkUnique .= PHP_EOL.'        $check[\'' . $v . '\'] = $data[\'' . $v . '\'];';
+                    $checkUnique .= PHP_EOL . '        $check[\'' . $v . '\'] = $data[\'' . $v . '\'];';
                     $message[] = $this->option['fcomment'][$v];
                 }
-                $checkUnique .= PHP_EOL.'        $selector->where($check);';
+                $checkUnique .= PHP_EOL . '        $selector->where($check);';
             }
-            $checkUnique .= PHP_EOL.'        $row = $selector->find();';
-            $checkUnique .= PHP_EOL.'        if ($row) {';
+            $checkUnique .= PHP_EOL . '        $row = $selector->find();';
+            $checkUnique .= PHP_EOL . '        if ($row) {';
 
-            $checkUnique .= PHP_EOL.'            throw new \Exception(\'' . implode(',', $message) . '不能重复~\');';
-            $checkUnique .= PHP_EOL.'        }';
+            $checkUnique .= PHP_EOL . '            throw new \Exception(\'' . implode(',', $message) . '不能重复~\');';
+            $checkUnique .= PHP_EOL . '        }';
         }
 
         $str = str_replace('{{checkUnique}}', $checkUnique, $str);

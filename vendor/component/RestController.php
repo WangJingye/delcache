@@ -25,10 +25,20 @@ class RestController extends \Controller
         if ($this->filter) {
             \App::$request->params->load([$this->filter => \App::$user['id']]);
         }
-        if (!in_array(\App::$request->action, $this->actions)) {
-            throw new \Exception('404 NOT FOUND');
+        if (in_array(\App::$request->action, self::getActions()) && !in_array(\App::$request->action, $this->actions)) {
+            throw new \Exception('404 NOT FOUND', 404);
         }
         parent::init();
+    }
+
+    protected function getActions()
+    {
+        return [
+            'index',
+            'create',
+            'update',
+            'delete'
+        ];
     }
 
     //列表

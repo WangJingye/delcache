@@ -55,11 +55,10 @@ class App extends ObjectAccess
             if (!file_exists(str_replace('\\', '/', BASE_PATH . $controller . '.php'))) {
                 $msg = APP_DEBUG ? 'Controller is not exist' : 'Page not found';
                 throw new \Exception($msg, 404);
-
             }
+
             /** @var Controller $controller */
             $controller = new $controller();
-
             if (!in_array($action, get_class_methods($controller))) {
                 $msg = APP_DEBUG ? 'Action is not exist' : 'Page not found';
                 throw new \Exception($msg, 404);
