@@ -10,15 +10,6 @@ $(function () {
                 required: '请输入角色名称'
             }
         },
-        errorClass: "invalid-feedback",
-        errorElement: "div",
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
-            $(element).addClass('is-valid');
-        },
         submitHandler: function (e) {
             saveForm();
             return false;

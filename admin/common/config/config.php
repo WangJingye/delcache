@@ -10,6 +10,7 @@ $configs = [
     ],
     'actionWhiteList' => [
         'system/admin' => ['profile', 'change-password', 'change-profile'],
+        'system/upload' => ['*'],
     ]
 ];
 return array_merge($runtimeConfig, $configs);

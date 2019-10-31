@@ -35,18 +35,7 @@
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">个人头像</label>
                 <div class="col-sm-8">
-                    <div class="fileinput-box">
-                        <?php if (isset(\App::$user['avatar']) && \App::$user['avatar']): ?>
-                            <img src="<?= \App::$user['avatar'] ?>">
-                        <?php endif; ?>
-                        <div class="fileinput-button">
-                            <div class="plus-symbol" <?= isset(\App::$user['avatar']) && \App::$user['avatar'] ? 'style="display:none"' : '' ?>>
-                                +
-                            </div>
-                            <input class="fileinput-input" type="file" name="file" value="">
-                        </div>
-                    </div>
-                    <div style="text-align: center;color:red;font-size: 0.5rem;width: 80px">点击修改</div>
+                    <?= \admin\extend\image\ImageInput::instance($this->model['avatar'], 'avatar')->show(); ?>
                 </div>
             </div>
             <div class="form-group row">

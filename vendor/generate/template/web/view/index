@@ -34,7 +34,9 @@
                     <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}', ['{{primaryKey}}' => $v['{{primaryKey}}']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
                     </a>
-                    <div class="btn btn-danger btn-sm remove-btn" data-{{primaryKey}}="<?= $v['{{primaryKey}}'] ?>"><i class="glyphicon glyphicon-trash"></i> 删除</div>
+                    <div class="btn btn-danger btn-sm remove-btn" data-{{primaryKey}}="<?= $v['{{primaryKey}}'] ?>">
+                        <i class="glyphicon glyphicon-trash"></i> 删除
+                    </div>{{statusIndex}}
                 </td>
             </tr>
         <?php endforeach; ?>

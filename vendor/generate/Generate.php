@@ -113,11 +113,52 @@ class Generate extends \ObjectAccess
             }
             $rules .= PHP_EOL . '            ' . $field . ': {';
             $rulesMessage .= PHP_EOL . '            ' . $field . ': {';
-            $rules .= PHP_EOL . '                required: true';;
-            $rulesMessage .= PHP_EOL . '                required: \'请输入' . $label . '\'';;
+            $rules .= PHP_EOL . '                required: true';
+            $rulesMessage .= PHP_EOL . '                required: \'请输入' . $label . '\'';
             $rules .= PHP_EOL . '            }';
             $rulesMessage .= PHP_EOL . '            }';
 
+        }
+        $statusJs = '';
+        if (isset($this->option['fcomment']['status'])) {
+            $statusJs = PHP_EOL . '    $(\'.set-status-btn\').click(function () {
+        let $this = $(this);
+        let tr = $(this).parents(\'tr\');
+        let args = {
+            id: $this.data(\'id\'),
+            status: $this.data(\'status\')
+        };
+        $.loading(\'show\');
+        $.post($this.data(\'url\'), args, function (res) {
+            $.loading(\'hide\');
+            if (res.code == 200) {
+                $.success(res.message);
+                var data = {
+                    \'btn_class\': \'btn-danger\',
+                    \'class_name\': \'glyphicon-remove-circle\',
+                    \'status\': 0,
+                    \'name\': \'下架\',
+                    \'title\': \'正常\',
+                };
+                if (args.status == 0) {
+                    data = {
+                        \'btn_class\': \'btn-success\',
+                        \'class_name\': \'glyphicon-ok-circle\',
+                        \'status\': 1,
+                        \'name\': \'上架\',
+                        \'title\': \'已下架\',
+                    };
+                }
+                tr.find(\'.status\').html(data.title);
+                $this.data(\'status\', data.status);
+                $this.removeClass(\'btn-success\').removeClass(\'btn-danger\').addClass(data.btn_class);
+                $this.find(\'.glyphicon\').removeClass(\'glyphicon-remove-circle\').removeClass(\'glyphicon-ok-circle\').addClass(data.class_name);
+                $this.find(\'span\').html(data.name);
+            } else {
+                $.error(res.message);
+            }
+        }, \'json\');
+    });';
         }
         $filename = $dir . '/' . $this->controllerUrl . '.js';
         $file = $this->templatePath . 'js';
@@ -129,6 +170,7 @@ class Generate extends \ObjectAccess
         $str = str_replace('{{module}}', $this->module, $str);
         $str = str_replace('{{rules}}', $rules, $str);
         $str = str_replace('{{rulesMessage}}', $rulesMessage, $str);
+        $str = str_replace('{{statusJs}}', $statusJs, $str);
         $str = str_replace('{{primaryKey}}', $this->primaryKey, $str);
 
         if (!file_exists($filename)) {
@@ -154,58 +196,22 @@ class Generate extends \ObjectAccess
             }
             $inputParams .= PHP_EOL . '    <div class="form-group row">';
             $inputParams .= PHP_EOL . '        <label class="col-sm-4 text-nowrap col-form-label form-label">' . $label . '</label>';
-            if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
-                $inputParams .= PHP_EOL . '        <div class="col-sm-8 form-radio-group">';
+            $inputParams .= PHP_EOL . '        <div class="col-sm-8">';
+            if (in_array($this->option['ftype'][$field], ['select', 'select2', 'radio', 'checkbox'])) {
                 $res = $this->getChooseList($field);
-            } else {
-                $inputParams .= PHP_EOL . '        <div class="col-sm-8">';
             }
-            if ($this->option['ftype'][$field] == 'select') {
-                $inputParams .= PHP_EOL . '            <select name="' . $field . '" class="form-control">';
-                $inputParams .= PHP_EOL . '                <option value="">请选择</option>';
-                $inputParams .= PHP_EOL . '                <?php foreach ($this->' . $res['variable'] . ' as $key => $v): ?>';
-                $inputParams .= PHP_EOL . '                    <option value="<?= $key ?>" <?= $this->model[\'' . $field . '\'] == $key ? \'selected\' : \'\' ?>><?= $v ?></option>';
-                $inputParams .= PHP_EOL . '                <?php endforeach; ?>';
-                $inputParams .= PHP_EOL . '            </select>';
-            } else if ($this->option['ftype'][$field] == 'radio') {
-                $inputParams .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
-                $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
-                $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
-                $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="radio" name="' . $field . '"';
-                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= $this->model[\'' . $field . '\'] == $k ? \'checked\' : \'\' ?>>';
-                $inputParams .= PHP_EOL . '                        <?= $v ?>';
-                $inputParams .= PHP_EOL . '                    </label>';
-                $inputParams .= PHP_EOL . '                </div>';
-                $inputParams .= PHP_EOL . '            <?php endforeach; ?>';
-            } else if ($this->option['ftype'][$field] == 'checkbox') {
-                $inputParams .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
-                $inputParams .= PHP_EOL . '                <div class="form-check form-check-inline text-nowrap">';
-                $inputParams .= PHP_EOL . '                    <label class="form-check-label">';
-                $inputParams .= PHP_EOL . '                        <input class="form-check-input" type="checkbox" name="' . $field . '"';
-                $inputParams .= PHP_EOL . '                               value="<?= $k ?>" <?= $this->model[\'' . $field . '\'] == $k ? \'checked\' : \'\' ?>>';
-                $inputParams .= PHP_EOL . '                        <?= $v ?>';
-                $inputParams .= PHP_EOL . '                    </label>';
-                $inputParams .= PHP_EOL . '                </div>';
-                $inputParams .= PHP_EOL . '            <?php endforeach; ?>';
+            if (in_array($this->option['ftype'][$field], ['select', 'select2', 'radio', 'checkbox'])) {
+                $inputParams .= PHP_EOL . '            <?= \admin\extend\input\SelectInput::instance($this->' . $res['variable'] . ', $this->model[\'' . $field . '\'], \'' . $field . '\',\'' . $this->option['ftype'][$field] . '\')->show(); ?>';
             } else if ($this->option['ftype'][$field] == 'textarea') {
                 $inputParams .= PHP_EOL . '            <textarea name="' . $field . '" class="form-control" placeholder="请输入' . $label . '"><?= $this->model[\'' . $field . '\'] ?></textarea>';
             } else if ($this->option['ftype'][$field] == 'image') {
-                $inputParams .= PHP_EOL . '            <div class="fileinput-box">';
-                $inputParams .= PHP_EOL . '                <?php if (isset($this->model[\'' . $field . '\']) && $this->model[\'' . $field . '\']): ?>';
-                $inputParams .= PHP_EOL . '                    <img src="<?= $this->model[\'' . $field . '\'] ?>">';
-                $inputParams .= PHP_EOL . '                <?php endif; ?>';
-                $inputParams .= PHP_EOL . '                <div class="fileinput-button">';
-                $inputParams .= PHP_EOL . '                    <div class="plus-symbol" <?= $this->model[\'' . $field . '\'] ? \'style="display:none"\' : \'\' ?>>';
-                $inputParams .= PHP_EOL . '                        +';
-                $inputParams .= PHP_EOL . '                    </div>';
-                $inputParams .= PHP_EOL . '                    <input class="fileinput-input" type="file" name="' . $field . '" value="">';
-                $inputParams .= PHP_EOL . '                </div>';
-                $inputParams .= PHP_EOL . '            </div>';
-                $inputParams .= PHP_EOL . '            <div style="text-align: center;color:red;font-size: 0.5rem;width: 80px">点击修改</div>';
+                $inputParams .= PHP_EOL . '            <?= \admin\extend\image\ImageInput::instance($this->model[\'' . $field . '\'], \'' . $field . '\', 9)->show(); ?>';;
             } else {
                 $placeholder = '请输入' . $label;
                 if (in_array($this->option['ftype'][$field], ['date', 'date-normal', 'datetime', 'datetime-normal'])) {
                     $placeholder = $label . '，格式为2019-01-01';
+                } else if (in_array($this->option['ftype'][$field], ['datetime', 'datetime-normal'])) {
+                    $placeholder = $label . '，格式为2019-01-01 09:00:00';
                 }
                 $inputParams .= PHP_EOL . '            <input type="text" name="' . $field . '" class="form-control" value="<?= $this->model[\'' . $field . '\']?>" placeholder="' . $placeholder . '">';
             }
@@ -255,10 +261,11 @@ class Generate extends \ObjectAccess
             if (isset($this->option['fpagesearch1'][$field]) && $this->option['fpagesearch1'][$field] == 1) {
                 $searchPer .= PHP_EOL . '    <div class="form-content">';
                 $searchPer .= PHP_EOL . '        <span class="col-form-label search-label">' . $label . '</span>';
-                if (!in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+                if (!in_array($this->option['ftype'][$field], ['select', 'select2', 'radio', 'checkbox'])) {
                     $searchPer .= PHP_EOL . '        <input class="form-control search-input" name="' . $field . '" value="<?= $this->params[\'' . $field . '\'] ?>">';
                 } else {
-                    $searchPer .= PHP_EOL . '        <select class="form-control search-input" name="' . $field . '">';
+                    $isSelect2 = $this->option['ftype'][$field] == 'select2' ? ' select2' : '';
+                    $searchPer .= PHP_EOL . '        <select class="form-control search-input' . $isSelect2 . '" name="' . $field . '">';
                     $searchPer .= PHP_EOL . '            <option value="">请选择</option>';
                     $searchPer .= PHP_EOL . '            <?php foreach ($this->' . $res['variable'] . ' as $k => $v): ?>';
                     $searchPer .= PHP_EOL . '                <option value="<?= $k ?>" <?= $this->params[\'' . $field . '\'] == (string)$k ? \'selected\' : \'\' ?>><?= $v ?></option>';
@@ -272,7 +279,22 @@ class Generate extends \ObjectAccess
             }
         }
         $searchList = '[' . implode(', ', $searchs) . ']';
-
+        $statusIndex = '';
+        if (isset($this->option['fcomment']['status'])) {
+            $statusIndex = PHP_EOL . '                    <?php if ($v[\'status\'] == 1): ?>
+                        <div class="btn btn-danger btn-sm set-status-btn" data-id="<?= $v[\'' . $this->primaryKey . '\'] ?>"
+                             data-url="<?= \App::$urlManager->createUrl(\'' . $this->module . '/' . $this->controllerUrl . '/set-status\') ?>"
+                             data-status="0">
+                            <i class="glyphicon glyphicon-remove-circle"></i> <span>禁用</span>
+                        </div>
+                    <?php else: ?>
+                        <div class="btn btn-success btn-sm set-status-btn" data-id="<?= $v[\'' . $this->primaryKey . '\'] ?>"
+                             data-url="<?= \App::$urlManager->createUrl(\'' . $this->module . '/' . $this->controllerUrl . '/set-status\') ?>"
+                             data-status="1">
+                            <i class="glyphicon glyphicon-ok-circle"></i> <span>启用</span>
+                        </div>
+                    <?php endif; ?>';
+        }
 
         $filename = $dir . '/index.php';
         $file = $this->templatePath . 'view/index';
@@ -286,6 +308,7 @@ class Generate extends \ObjectAccess
         $str = str_replace('{{searchList}}', $searchList, $str);
         $str = str_replace('{{table-header}}', $header, $str);
         $str = str_replace('{{table-body}}', $body, $str);
+        $str = str_replace('{{statusIndex}}', $statusIndex, $str);
         $str = str_replace('{{primaryKey}}', $this->primaryKey, $str);
 
         if (!file_exists($filename)) {
@@ -309,10 +332,6 @@ class Generate extends \ObjectAccess
                 return ['variable' => $var, 'list' => $res, 'type' => 1];
             } else {
                 $arr = $this->option['fchoicelist'][$field] ? explode(':', $this->option['fchoicelist'][$field]) : [];
-//                $wheres=explode(',',$arr[4]);
-//                foreach ($wheres as $v){
-//                    explode('',$v)
-//                }
                 $res = [
                     'type' => 2,
                     'variable' => $arr[3],
@@ -339,7 +358,7 @@ class Generate extends \ObjectAccess
         $parseFile = '';
         $otherDefineService = '';
         foreach ($this->option['fcomment'] as $field => $label) {
-            if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
+            if (in_array($this->option['ftype'][$field], ['select', 'select2', 'radio', 'checkbox'])) {
                 $res = $this->getChooseList($field);
                 if ($res['type'] == 1) {
                     $otherDefineService .= PHP_EOL . '    public $' . $res['variable'] . ' = [';
@@ -359,6 +378,27 @@ class Generate extends \ObjectAccess
                 $parseFile .= PHP_EOL . '                }';
             }
         }
+        $statusAction = '';
+        if (isset($this->option['fcomment']['status'])) {
+            $statusAction = '/**
+     * @throws \Exception
+     */
+    public function setStatusAction()
+    {
+        $params = \App::$request->params->toArray();
+        if (\App::$request->isAjax() && \App::$request->isPost()) {
+            try {
+                if (!isset($params[\'id\']) || $params[\'id\'] == \'\') {
+                    throw new \Exception(\'非法请求\');
+                }
+                \Db::table(\'' . $this->table . '\')->where([\'' . $this->primaryKey . '\' => $params[\'id\']])->update([\'status\' => $params[\'status\']]);
+                $this->success($params[\'status\'] == 1 ? \'已启用\' : \'已禁用\');
+            } catch (\Exception $e) {
+                $this->error($e->getMessage());
+            }
+        }
+    }';
+        }
         $str = str_replace('{{table}}', $this->table, $str);
         $str = str_replace('{{otherDefineService}}', $otherDefineService, $str);
         $str = str_replace('{{otherAssign}}', $otherAssign, $str);
@@ -369,6 +409,7 @@ class Generate extends \ObjectAccess
         $str = str_replace('{{module}}', $this->module, $str);
         $str = str_replace('{{primaryKey}}', $this->primaryKey, $str);
         $str = str_replace('{{tablename}}', $this->option['name'], $str);
+        $str = str_replace('{{statusAction}}', $statusAction, $str);
         if (!file_exists($filename)) {
             file_put_contents($filename, $str);
         }

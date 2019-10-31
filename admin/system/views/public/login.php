@@ -22,7 +22,8 @@
             </div>
             <div class="form-group captcha-box">
                 <input type="text" class="form-control captcha" name="captcha" placeholder="验证码" maxlength="5">
-                <img src="/system/public/captcha" data-src="/system/public/captcha">
+                <img src="<?= \App::$urlManager->createUrl('system/public/captcha') ?>"
+                     data-src="<?= \App::$urlManager->createUrl('system/public/captcha') ?>">
             </div>
 
             <div class="form-group">

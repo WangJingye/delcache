@@ -98,6 +98,12 @@ class Controller extends ObjectAccess
         return implode(',', $res);
     }
 
+    /**
+     * @param $key
+     * @param string $path
+     * @return string
+     * @throws Exception
+     */
     public function parseFileOrUrl($key, $path = '/')
     {
         $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
@@ -105,15 +111,15 @@ class Controller extends ObjectAccess
             return $this->parseFile($_FILES[$key], $path);
         } else if ($urlList = \App::$request->params[$key]) {
             if (!is_array($urlList)) {
-                $urlList = [$urlList];
+                $urlList = explode(',', $urlList);
             }
             $res = [];
             $baseUrl = \App::$config->web_info['host'];
             foreach ($urlList as $url) {
-                if (strpos($url, $baseUrl) !== 0) {
+                if (strpos($url, $baseUrl . '/upload/common') !== 0) {
                     throw new \Exception('文件格式有误');
                 }
-                $filename = str_replace($baseUrl . '/upload/common', '', $url);
+                $filename = str_replace($baseUrl . '/upload/common/', '', $url);
                 $oldFilePath = PUBLIC_PATH . 'upload/common/';
                 $oldFilename = $oldFilePath . $filename;
                 $newFilePath = PUBLIC_PATH . 'upload/' . $path;

@@ -11,11 +11,14 @@ class WebController extends \Controller
         '/static/js/jquery.js',
         '/static/plugin/bootstrap/js/popper.min.js',
         '/static/plugin/bootstrap/js/bootstrap.js',
+        '/static/plugin/lightbox/js/lightbox.min.js',
         '/static/js/jquery.validate.js',
         '/static/js/select2.min.js',
         '/static/js/popup.js',
         '/static/js/ztree.core.js',
         '/static/js/ztree.excheck.js',
+        '/static/plugin/kindeditor/kindeditor-min.js',
+        '/static/plugin/kindeditor/lang/zh_CN.js',
         '/static/js/main.js',
     ];
 
@@ -24,11 +27,12 @@ class WebController extends \Controller
      * @var array
      */
     protected $cssList = [
+        '/static/plugin/lightbox/css/lightbox.css',
         '/static/plugin/bootstrap/css/bootstrap.css',
         '/static/plugin/bootstrap/css/fonts.css',
-        '/static/css/main.css',
         '/static/css/select2.css',
         '/static/css/ztree.css',
+        '/static/css/main.css',
     ];
 
     /** @var \Request $request */

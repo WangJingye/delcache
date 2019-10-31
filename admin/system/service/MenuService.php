@@ -208,6 +208,9 @@ class MenuService extends BaseService
         foreach ($arr as $ar) {
             foreach ($ar as $controller => $actions) {
                 foreach ($actions as $action) {
+                    if ($action == '*') {
+                        $actionList[] = strtolower($controller);
+                    }
                     $actionList[] = strtolower($controller . '/' . $action);
                 }
             }
@@ -245,8 +248,8 @@ class MenuService extends BaseService
                     $c = strtolower(trim(preg_replace('/([A-Z])/', '-$1', substr($controller, 0, -10)), '-'));
                     $a = strtolower(trim(preg_replace('/([A-Z])/', '-$1', substr($method, 0, -6)), '-'));
                     $uri = $module . '/' . $c . '/' . $a;
-                    if (($uri == $currentMethod || !in_array($uri, $existMethodList)) && !in_array(strtolower($uri), $actionList)) {
-                        $uriList[] = $uri;
+                    if (($uri == $currentMethod || !in_array($uri, $existMethodList)) && !in_array(strtolower($module . '/' . $c), $actionList) && !in_array(strtolower($uri), $actionList)) {
+                        $uriList[$uri] = $uri;
                     }
                 }
             }

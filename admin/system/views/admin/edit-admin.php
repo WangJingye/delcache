@@ -31,17 +31,7 @@
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">头像</label>
         <div class="col-sm-8">
-            <div class="fileinput-box">
-                <?php if (isset($this->model['avatar']) && $this->model['avatar']): ?>
-                    <img src="<?= $this->model['avatar'] ?>">
-                <?php endif; ?>
-                <div class="fileinput-button">
-                    <div class="plus-symbol" <?= isset($this->model['avatar']) && $this->model['avatar'] ? 'style="display:none"' : '' ?>>
-                        +
-                    </div>
-                    <input class="fileinput-input" type="file" name="file" value="">
-                </div>
-            </div>
+            <?= \admin\extend\image\ImageInput::instance($this->model['avatar'], 'avatar')->show(); ?>
         </div>
     </div>
     <div class="form-group row">

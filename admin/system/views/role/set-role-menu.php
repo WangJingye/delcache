@@ -1,10 +1,10 @@
 <form id="save-role-menu-form" action="<?= \App::$urlManager->createUrl('system/role/set-role-menu') ?>" method="post">
-    <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
+    <input type="hidden" name="id" value="<?= $this->model['id'] ?>">
     <div class="form-group row">
         <label class="col-sm-2 col-form-label">角色名称</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" readonly
-                   value="<?= isset($this->model['name']) ? $this->model['name'] : '' ?>" placeholder="请输入角色名称">
+                   value="<?= $this->model['name'] ?>" placeholder="请输入角色名称">
         </div>
     </div>
     <div class="form-group row">

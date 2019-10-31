@@ -69,7 +69,7 @@
                         <td class="ftype">
                             <?php $ftypeList = [
                                 'input' => 'input', 'radio' => 'radio', 'checkbox' => 'checkbox',
-                                'select' => 'select', 'textarea' => 'textarea', 'date' => 'date',
+                                'select' => 'select', 'select2' => 'select2', 'textarea' => 'textarea', 'date' => 'date',
                                 'date-normal' => 'date(文本)', 'datetime' => 'datetime', 'datetime-normal' => 'datetime(文本)'
                                 , 'image' => 'image',]; ?>
                             <select class="form-control" name="ftype[<?= $field ?>]">
@@ -141,6 +141,7 @@
                     <option value="radio">radio</option>
                     <option value="checkbox">checkbox</option>
                     <option value="select">select</option>
+                    <option value="select2">select2</option>
                     <option value="textarea">textarea</option>
                     <option value="date">date</option>
                     <option value="date-normal">date(文本)</option>
@@ -193,6 +194,7 @@
                         var tr = $('#table-body').clone();
                         tr.find('.fname').html(data[i]);
                         tr.find('.ftype select').attr('name', 'ftype[' + data[i] + ']');
+                        tr.find('.ftype select2').attr('name', 'ftype[' + data[i] + ']');
                         tr.find('.fchoice input[type=radio]').attr('name', 'fchoice[' + data[i] + ']');
                         tr.find('.fchoice input[type=text]').attr('name', 'fchoicelist[' + data[i] + ']');
                         tr.find('.fcomment input').attr('name', 'fcomment[' + data[i] + ']');

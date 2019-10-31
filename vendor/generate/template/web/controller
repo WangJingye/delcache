@@ -76,5 +76,5 @@ class {{table}}Controller extends BaseController
                 $this->error($e->getMessage());
             }
         }
-    }
+    }{{statusAction}}
 }

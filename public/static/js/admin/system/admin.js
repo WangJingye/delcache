@@ -99,15 +99,6 @@ $(function () {
                 equalTo: '确认密码和新登录密码不一致'
             }
         },
-        errorClass: "invalid-feedback",
-        errorElement: "div",
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
-            $(element).addClass('is-valid');
-        },
         submitHandler: function (e) {
             changePasswordForm();
             return false;

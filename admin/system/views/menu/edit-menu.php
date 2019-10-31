@@ -1,31 +1,22 @@
-<form class="form-box col-12 col-sm-8 col-md-6" id="save-form" action="<?= \App::$urlManager->createUrl('system/menu/edit-menu') ?>" method="post">
+<form class="form-box col-12 col-sm-8 col-md-6" id="save-form"
+      action="<?= \App::$urlManager->createUrl('system/menu/edit-menu') ?>" method="post">
     <input type="hidden" name="id" value="<?= isset($this->model['id']) ? $this->model['id'] : '' ?>">
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">父级功能</label>
         <div class="col-sm-8">
-            <select class="form-control select2" name="parent_id">
-                <?php foreach ($this->childList as $v): ?>
-                    <option value="<?= $v['id'] ?>" <?= isset($this->model['parent_id']) && $this->model['parent_id'] == $v['id'] ? 'selected' : '' ?>><?= $v['name'] ?></option>
-                <?php endforeach; ?>
-            </select>
+            <?= \admin\extend\input\SelectInput::instance(array_column($this->childList, 'name', 'id'), $this->model['parent_id'], 'parent_id', 'select2')->show(); ?>
         </div>
     </div>
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">链接地址</label>
         <div class="col-sm-8">
-            <select name="url" class="form-control">
-                <option value="">请选择</option>
-                <?php foreach ($this->methodList as $v): ?>
-                    <option value="<?= $v ?>" <?= isset($this->model['url']) && $this->model['url'] == $v ? 'selected' : '' ?>><?= $v ?></option>
-                <?php endforeach; ?>
-            </select>
+            <?= \admin\extend\input\SelectInput::instance($this->methodList, $this->model['url'], 'url', 'select')->show(); ?>
         </div>
     </div>
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">标题</label>
         <div class="col-sm-8">
-            <input type="text" name="name" class="form-control"
-                   value="<?= isset($this->model['name']) ? $this->model['name'] : '' ?>" placeholder="请输入标题">
+            <input type="text" name="name" class="form-control" value="<?= $this->model['name'] ?>" placeholder="请输入标题">
         </div>
     </div>
     <div class="form-group row">
@@ -46,8 +37,7 @@
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">菜单描述</label>
         <div class="col-sm-8">
-            <textarea name="desc"
-                      class="form-control"><?= isset($this->model['desc']) ? $this->model['desc'] : '' ?></textarea>
+            <textarea name="desc" class="form-control"><?= $this->model['desc'] ?></textarea>
         </div>
     </div>
     <div class="form-group row">

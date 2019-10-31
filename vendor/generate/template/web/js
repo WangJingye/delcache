@@ -4,15 +4,6 @@ $(function () {
         },
         messages: {{{rulesMessage}}
         },
-        errorClass: "invalid-feedback",
-        errorElement: "div",
-        highlight: function (element, errorClass, validClass) {
-            $(element).addClass('is-invalid');
-        },
-        unhighlight: function (element, errorClass, validClass) {
-            $(element).removeClass('is-invalid');
-            $(element).addClass('is-valid');
-        },
         submitHandler: function (e) {
             saveForm();
             return false;
@@ -37,7 +28,7 @@ $(function () {
                 $.error(res.message);
             }
         }, 'json');
-    });
+    });{{statusJs}}
 });
 
 function saveForm() {

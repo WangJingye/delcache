@@ -1,0 +1,523 @@
+http://www.kindsoft.net/license.php varsion=4.1
+
+/**************************************编辑器调用方法**************************************************/
+    
+在需要显示编辑器的位置添加TEXTAREA输入框。
+id在当前页面必须是唯一的值，还有，在有些浏览器上不设宽度和高度可能显示有问题，所以最好设一下宽度和高度。宽度和高度可用inline样式设置，也可用编辑器初始化参数设置。
+在TEXTAREA里设置HTML内容即可实现编辑，在这里需要注意的是，如果从服务器端程序(ASP、PHP、ASP.NET等)直接显示内容，则必须转换HTML特殊字符(>,<,&,")。 具体请参考各语言目录下面的demo.xxx程序，目前支持ASP、ASP.NET、PHP、JSP。
+
+<textarea id="editor_id" name="content" style="width:700px;height:300px;">
+&lt;strong&gt;HTML内容&lt;/strong&gt;
+</textarea>
+
+在该HTML页面添加以下脚本。
+
+<script charset="utf-8" src="/editor/kindeditor.js"></script>
+<script>
+    KE.show({
+	    id : 'editor_id'
+    });
+</script>
+
+注：KE.show的原理是先执行KE.init设置一些变量，等DOM全部创建以后才开始执行KE.create创建编辑器。 如果浏览器不触发DOMContentLoaded事件（例如：jQuery的$.ready，点击某个按钮，通过innerHTML插入HTML等），则不能使用KE.show，需要直接调用KE.init和KE.create。
+
+KE.init({
+    id : 'editor_id'
+});
+$.ready(function() {
+    KE.create('editor_id');
+});
+
+调用KE.show和KE.init时，除id之外还可以设置其它的参数，具体属性请参考编辑器初始化参数。
+取得编辑器的HTML内容。
+KindEditor的可视化操作在新创建的iframe上执行，代码模式下的textarea框也是新创建的，所以最后提交前需要将HTML数据同步到原来的textarea，KE.sync函数会完成这个动作。
+KindEditor在默认情况下自动寻找textarea所属的form元素，找到form后onsubmit事件里添加KE.sync函数，所以用form方式提交数据，不需要手动执行KE.sync函数。
+
+//取得HTML内容
+html = KE.html('editor_id');
+
+//同步数据后可以直接取得textarea的value
+KE.sync('editor_id');
+html = document.getElementById('editor_id').value;
+html = $('#editor_id').val(); //jQuery
+
+//设置HTML内容
+KE.html('editor_id', 'HTML内容');
+
+/****************************************编辑器初始化参数*******************************************************/
+调用KE.show或KE.init时可以设置以下参数。
+
+    id
+    TEXTAREA输入框的ID，必须设置。
+    数据类型：String
+    items
+    配置编辑器的工具栏，其中"-"表示换行，"|"表示分隔符。
+    数据类型：Array
+    默认值：
+
+    ['source', '|', 'fullscreen', 'undo', 'redo', 'print', 'cut', 'copy', 'paste',
+    'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+    'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript',
+    'superscript', '|', 'selectall', '-',
+    'title', 'fontname', 'fontsize', '|', 'textcolor', 'bgcolor', 'bold',
+    'italic', 'underline', 'strikethrough', 'removeformat', '|', 'image',
+    'flash', 'media', 'advtable', 'hr', 'emoticons', 'link', 'unlink', '|', 'about']
+
+    width
+    编辑器的宽度，可以设置px或%，比TEXTAREA输入框样式表宽度优先度高。
+    数据类型：String
+    默认值：TEXTAREA输入框的宽度
+    注: 3.2版本开始支持。
+    height
+    编辑器的高度，只能设置px，比TEXTAREA输入框样式表高度优先度高。
+    数据类型：String
+    默认值：TEXTAREA输入框的高度
+    注: 3.2版本开始支持。
+    minWidth
+    数据类型：Int
+    指定编辑器最小宽度，单位为px。
+    默认值：200
+    minHeight
+    数据类型：Int
+    指定编辑器最小高度，单位为px。
+    默认值：100
+    filterMode
+    数据类型：Boolean
+    true时过滤HTML代码，false时允许输入任何代码。
+    默认值：false
+    注: 3.4以前版本的filterMode默认值为true。
+    htmlTags
+    指定要保留的HTML标记和属性。哈希数组的key为HTML标签名，value为HTML属性数组，"."开始的属性表示style属性。
+    数据类型：Object
+    默认值：
+
+    {
+            font : ['color', 'size', 'face', '.background-color'],
+            span : ['style'],
+            div : ['class', 'align', 'style'],
+            table: ['class', 'border', 'cellspacing', 'cellpadding', 'width', 'height', 'align', 'style'],
+            'td,th': ['class', 'align', 'valign', 'width', 'height', 'colspan', 'rowspan', 'bgcolor', 'style'],
+            a : ['class', 'href', 'target', 'name', 'style'],
+            embed : ['src', 'width', 'height', 'type', 'loop', 'autostart', 'quality',
+            'style', 'align', 'allowscriptaccess', '/'],
+            img : ['src', 'width', 'height', 'border', 'alt', 'title', 'align', 'style', '/'],
+            hr : ['class', '/'],
+            br : ['/'],
+            'p,ol,ul,li,blockquote,h1,h2,h3,h4,h5,h6' : ['align', 'style'],
+            'tbody,tr,strong,b,sub,sup,em,i,u,strike' : []
+    }
+
+    注：filterMode为true时有效。3.4版本开始属性可设置style，保留所有inline样式。
+    resizeMode
+    2或1或0，2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动。
+    数据类型：Int
+    默认值：2
+    skinType
+    风格类型，default
+    数据类型：String
+    默认值：default
+    wyswygMode
+    可视化模式或代码模式
+    数据类型：Boolean
+    默认值：true
+    cssPath
+    指定编辑器iframe document的CSS，用于设置可视化区域的样式。
+    数据类型：String或Array
+    默认值：空
+    注：3.4.1版本开始可指定多个CSS文件。例如：cssPath : ['a.css', 'b.css']
+    skinsPath
+    指定编辑器的skins目录，skins目录存放风格的css文件和gif图片。
+    数据类型：String
+    默认值：KE.scriptPath + 'skins/'
+    pluginsPath
+    指定编辑器的plugins目录。
+    数据类型：String
+    默认值：KE.scriptPath + 'plugins/'
+    minChangeSize
+    undo/redo文字输入最小变化长度，当输入的文字变化小于这个长度时不会添加到undo堆栈里。
+    数据类型：Int
+    默认值：5
+    loadStyleMode
+    true时自动加载编辑器的CSS。
+    数据类型：Boolean
+    默认值：true
+    注: 3.4版本开始支持。
+    urlType
+    改变站内本地URL，可设置空、relative、absolute、domain。空为不修改URL，relative为相对路径，absolute为绝对路径，domain为带域名的绝对路径。
+    数据类型：String
+    默认值：空
+    注: 3.4版本开始支持，3.4.1版本开始默认值为空。
+    newlineTag
+    设置回车换行标签，可设置p、br。
+    数据类型：String
+    默认值：br
+    注: 3.4版本开始支持。
+    afterCreate
+    设置编辑器创建后执行的回调函数。
+    数据类型：Function
+    默认值：无
+    afterDialogCreate
+    设置弹出浮动框创建后执行的回调函数。
+    数据类型：Function
+    默认值：无
+    注: 3.4.3版本开始支持。
+    allowUpload
+    true或false，true时显示上传图片标签。
+    数据类型：Boolean
+    默认值：true
+    注: 3.4版本开始支持。
+    allowFileManager
+    true或false，true时显示浏览服务器图片功能。
+    数据类型：Boolean
+    默认值：false
+    注: 3.4版本开始支持。
+    referMethod
+    设置referMethod后上传图片的POST参数里有referMethod。
+    数据类型：String
+    默认值：空
+    注: 3.4版本开始支持。
+    dialogAlignType
+    设置弹出框(dialog)的对齐类型，可设置page和空，指定page时按当前页面居中，指定空时按编辑器居中。
+    数据类型：String
+    默认值：page
+    注: 3.4.1版本开始支持。
+    imageUploadJson
+    指定上传图片的服务器端程序。
+    数据类型：String
+    默认值：../../php/upload_json.php
+    注: 3.4.1版本开始支持。
+    fileManagerJson
+    指定浏览远程图片的服务器端程序。
+    数据类型：String
+    默认值：../../php/file_manager_json.php
+    注: 3.4.1版本开始支持。
+    shadowMode
+    true或false，true时弹出层显示阴影。
+    数据类型：Boolean
+    默认值：true
+    注: 3.5版本开始支持。
+    allowPreviewEmoticons
+    true或false，true时鼠标放在表情上可以预览表情。
+    数据类型：Boolean
+    默认值：true
+    注: 3.5版本开始支持。
+    useContextmenu
+    true或false，true时使用自定义右键菜单，false时屏蔽自定义右键菜单。
+    数据类型：Boolean
+    默认值：true
+    注: 3.5.3版本开始支持。
+    syncType
+    同步数据的方式，可设置"","auto","form"，值为"auto"时每次修改时都会同步，"form"时提交form时同步，空时不会自动同步。
+    数据类型：String
+    默认值："form"
+    注: 3.5.3版本开始支持。
+    tabIndex
+    编辑器的tabindex。
+    数据类型：Int
+    默认值：TEXTAREA输入框的tabindex
+    注: 3.5.3版本开始支持。
+    afterChange
+    编辑器内容发生变化后执行的回调函数。
+    数据类型：Function
+    默认值：无
+    注: 3.5.3版本开始支持。
+    afterTab
+    按下TAB键后执行的的回调函数。
+    数据类型：Function
+    默认值：
+
+    function(id) {
+            KE.util.setSelection(id);
+            KE.util.insertHtml(id, '    ');
+    }
+
+    注: 3.5.3版本开始支持。
+    afterFocus
+    编辑器聚焦(focus)时执行的回调函数。
+    数据类型：Function
+    默认值：无
+    注: 3.5.3版本开始支持。
+    afterBlur
+    编辑器失去焦点(blur)时执行的回调函数。
+    数据类型：Function
+    默认值：无
+    注: 3.5.3版本开始支持。
+
+参数设置例子：
+
+KE.show({
+        id : "content_1",
+        width : "70%", //编辑器的宽度为70%
+        height : "200px", //编辑器的高度为100px
+        filterMode : false, //不会过滤HTML代码
+        resizeMode : 1 //编辑器只能调整高度
+});
+
+
+/*******************************************添加自定义插件**************************************************/
+
+一、添加"你好"插件
+
+    定义KE.lang['hello'] = "你好"。
+
+    KE.lang['hello'] = "您好";
+              
+
+    定义KE.plugin['hello']，所有逻辑都在这个对象里，点击图标时默认执行click方法。
+
+    KE.plugin['hello'] = {
+        click : function(id) {
+            alert("您好");
+        }
+    };
+              
+
+    页面里添加图标定义CSS。
+
+    .ke-icon-hello {
+          background-image: url(./skins/default.gif);
+          background-position: 0px -672px;
+          width: 16px;
+          height: 16px;
+    }
+              
+
+    最后调用编辑器时items数组里添加hello。
+
+    KE.show({
+        id : 'content1',
+        items : ['hello']
+    });
+           
+
+二、添加插入远程图片的插件
+
+    定义KE.lang['remote_image'] = "插入远程图片"。
+
+    KE.lang['remote_image'] = "插入远程图片";
+              
+
+    定义KE.plugin['remote_image']。
+
+    KE.plugin['remote_image'] = {
+        click : function(id) {
+            KE.util.selection(id);
+            var dialog = new KE.dialog({
+                id : id,
+                cmd : 'remote_image',
+                width : 310,
+                height : 90,
+                title : KE.lang['image'],
+                yesButton : KE.lang['yes'],
+                noButton : KE.lang['no']
+            });
+            dialog.show();
+        },
+        check : function(id) {
+            var dialogDoc = KE.util.getIframeDoc(KE.g[id].dialog);
+            var url = KE.$('url', dialogDoc).value;
+            var title = KE.$('imgTitle', dialogDoc).value;
+            var width = KE.$('imgWidth', dialogDoc).value;
+            var height = KE.$('imgHeight', dialogDoc).value;
+            var border = KE.$('imgBorder', dialogDoc).value;
+            if (url.match(/\.(jpg|jpeg|gif|bmp|png)$/i) == null) {
+                alert(KE.lang['invalidImg']);
+                window.focus();
+                KE.g[id].yesButton.focus();
+                return false;
+            }
+            if (width.match(/^\d+$/) == null) {
+                alert(KE.lang['invalidWidth']);
+                window.focus();
+                KE.g[id].yesButton.focus();
+                return false;
+            }
+            if (height.match(/^\d+$/) == null) {
+                alert(KE.lang['invalidHeight']);
+                window.focus();
+                KE.g[id].yesButton.focus();
+                return false;
+            }
+            if (border.match(/^\d+$/) == null) {
+                alert(KE.lang['invalidBorder']);
+                window.focus();
+                KE.g[id].yesButton.focus();
+                return false;
+            }
+            return true;
+        },
+        exec : function(id) {
+            KE.util.select(id);
+            var iframeDoc = KE.g[id].iframeDoc;
+            var dialogDoc = KE.util.getIframeDoc(KE.g[id].dialog);
+            if (!this.check(id)) return false;
+            var url = KE.$('url', dialogDoc).value;
+            var title = KE.$('imgTitle', dialogDoc).value;
+            var width = KE.$('imgWidth', dialogDoc).value;
+            var height = KE.$('imgHeight', dialogDoc).value;
+            var border = KE.$('imgBorder', dialogDoc).value;
+            this.insert(id, url, title, width, height, border);
+        },
+        insert : function(id, url, title, width, height, border) {
+            var html = '<img src="' + url + '" ';
+            if (width > 0) html += 'width="' + width + '" ';
+            if (height > 0) html += 'height="' + height + '" ';
+            if (title) html += 'title="' + title + '" ';
+            html += 'alt="' + title + '" ';
+            html += 'border="' + border + '" />';
+            KE.util.insertHtml(id, html);
+            KE.layout.hide(id);
+            KE.util.focus(id);
+        }
+    };
+              
+
+    页面里添加图标定义CSS。
+
+    .ke-icon-remote_image {
+          background-image: url(./skins/default.gif);
+          background-position: 0px -496px;
+          width: 16px;
+          height: 16px;
+    }
+              
+
+    最后调用编辑器时items数组里添加remote_image。
+
+    KE.show({
+        id : 'content1',
+        items : ['remote_image']
+    });
+  
+	      
+ /*************************************API文档********************************************************/
+ 一、变量
+
+    KE.scriptPath
+    kindeditor.js的路径。
+    数据类型：String
+    KE.browser
+    浏览器类型和版本，分别为KE.browser.IE、KE.browser.WEBKIT、KE.browser.GECKO、KE.browser.OPERA、KE.browser.VERSION。
+    数据类型：Object
+    注：3.4以前版本直接返回字符串，分别为"IE"、"WEBKIT"、"GECKO"、"OPERA"。
+    KE.g[id].iframeDoc
+    编辑区域的iframe对象。
+    数据类型：Element
+    KE.g[id].keSel
+    当前选中信息的KE.selection对象，id为编辑器ID。
+    数据类型：Object
+    KE.g[id].keRange
+    当前选中信息的KE.range对象，id为编辑器ID。
+    数据类型：Object
+    KE.g[id].sel
+    当前选中信息的浏览器原生selection对象，id为编辑器ID。
+    数据类型：Object
+    KE.g[id].range
+    当前选中信息的浏览器原生range对象，id为编辑器ID。
+    数据类型：Object
+
+二、函数
+
+    KE.show(config)
+    初始化并创建编辑器。执行本函数时先调用KE.init设置初始化参数，然后在DOM加载完成后执行KE.create。
+    参数：
+    config：Object，编辑器属性集合，具体请参考编辑器属性
+    返回值：无
+    KE.init(config)
+    设置编辑器的初始化参数，loadStyleMode为true时自动加载CSS文件。
+    参数：
+    config：Object，编辑器属性集合，具体请参考编辑器属性
+    返回值：无
+    KE.create(id, mode)
+    创建编辑器。
+    参数：
+    id：String，编辑器的ID
+    mode：Int，可选参数，指定1时在body下面创建编辑器，0或未指定时在TEXTAREA前面创建编辑器。
+    返回值：无
+    KE.remove(id, mode)
+    移除编辑器。
+    参数：
+    id：String，编辑器的ID
+    mode：Int，可选参数，指定1时移除在body下面的编辑器，0或未指定时移除在TEXTAREA前面的编辑器。
+    返回值：无
+    KE.html(id)
+    取得编辑器的HTML内容。
+    参数：
+    id：String，编辑器的ID
+    返回值：
+    String，HTML字符串
+    注: 3.5版本开始支持，旧版本可以使用KE.util.getData(id)。
+    KE.html(id, val)
+    设置编辑器的HTML内容。
+    参数：
+    id：String，编辑器的ID
+    val: String，HTML字符串
+    返回值：无
+    注: 3.5版本开始支持，旧版本可以使用KE.util.setFullHtml(id, val)。
+    KE.text(id)
+    取得编辑器的纯文本内容。
+    参数：
+    id：String，编辑器的ID
+    返回值：
+    String，去除HTML代码后的文本
+    注: 3.5版本开始支持。
+    KE.text(id, val)
+    设置编辑器的内容，直接显示HTML代码。
+    参数：
+    id：String，编辑器的ID
+    val: String，文本
+    返回值：无
+    注: 3.5版本开始支持。
+    KE.selectedHtml(id)
+    取得当前被选中的HTML内容。
+    参数：
+    id：String，编辑器的ID
+    返回值：
+    String，HTML字符串
+    注: 3.5版本开始支持。
+    KE.count(id, mode)
+    取得编辑器内容的文字数量。
+    参数：
+    id：String，编辑器的ID
+    mode：String，可选参数，默认值也"html"，mode为"html"时取得字数包含HTML代码，mode为"text"时只包含纯文本、IMG、EMBED。
+    返回值：
+    Int，文字数量
+    注: 3.5版本开始支持。
+    KE.isEmpty(id)
+    判断编辑器是否有可见内容，比如文本、图片、视频。
+    参数：
+    id：String，编辑器的ID
+    返回值：Boolean
+    注: 3.5版本开始支持，旧版本可以使用KE.util.isEmpty(id)。
+    KE.insertHtml(id, val)
+    将指定的HTML内容插入到编辑区域里的光标处。
+    参数：
+    id：String，编辑器的ID
+    val: String，HTML字符串
+    返回值：无
+    注: 3.5版本开始支持，旧版本可以使用KE.util.insertHtml(id, val)。
+    KE.appendHtml(id, val)
+    将指定的HTML内容添加到编辑区域最后位置。
+    参数：
+    id：String，编辑器的ID
+    val: String，HTML字符串
+    返回值：无
+    注: 3.5版本开始支持。
+    KE.focus(id)
+    编辑器聚焦。
+    参数：
+    id：String，编辑器的ID
+    返回值：无
+    注: 3.5版本开始支持。
+    KE.blur(id)
+    编辑器失去焦点。
+    参数：
+    id：String，编辑器的ID
+    返回值：无
+    注: 3.5.3版本开始支持。
+    KE.sync(id)
+    将编辑器的内容设置到原来的TEXTAREA控件里。
+    参数：
+    id：String，编辑器的ID
+    返回值：无
+    注: 3.5.3版本开始支持，旧版本可以使用KE.util.setData(id)。
