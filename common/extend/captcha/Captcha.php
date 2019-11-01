@@ -193,6 +193,7 @@ class Captcha
 
     private function outputImage()
     {
+        ob_clean();
         if (imagetypes() & IMG_GIF) {
             header("Content-Type:image/gif");
             imagegif($this->image);
@@ -208,7 +209,7 @@ class Captcha
         } else {
             die("PHP不支持图像创建");
         }
-        imagedestroy($this->_image);
+        imagedestroy($this->image);
         exit;
     }
 

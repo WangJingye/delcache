@@ -20,6 +20,16 @@ $configs = [
         // 默认操作名
         'default_action' => 'index',
     ],
+    'console' => [
+        // 默认模块名
+        'default_module' => 'common',
+        // 禁止访问模块
+        'deny_module_list' => ['common'],
+        // 默认控制器名
+        'default_controller' => 'home',
+        // 默认操作名
+        'default_action' => 'index',
+    ],
     'wechat' => [
         'app_id' => '',//小程序ID
         'app_secret' => '',//小程序密钥

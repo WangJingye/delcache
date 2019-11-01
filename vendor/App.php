@@ -73,8 +73,10 @@ class App extends ObjectAccess
             if ($errorCode == 0) {
                 $errorCode = 500;
             }
-            if (APP == 'api'||\App::$request->isAjax()) {
+            if (APP == 'api' || (APP == 'admin' && \App::$request->isAjax())) {
                 exit(json_encode(['code' => $errorCode, 'message' => $e->getMessage(), 'data' => null]));
+            } else if (APP == 'console') {
+                throw new \Exception($e->getMessage(), $e->getCode());
             }
             header('status:' . $errorCode);
             $errorMsg = [
