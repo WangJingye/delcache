@@ -1,5 +1,5 @@
 <div class="btn-box clearfix">
-    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}') ?>">
+    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit') ?>">
         <div class="btn btn-success pull-right"><i class="glyphicon glyphicon-plus"></i> 创建</div>
     </a>
 </div>
@@ -31,7 +31,7 @@
         <?php foreach ($this->list as $v): ?>
             <tr>{{table-body}}
                 <td>
-                    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit-{{controllerUrl}}', ['{{primaryKey}}' => $v['{{primaryKey}}']]) ?>">
+                    <a href="<?= \App::$urlManager->createUrl('{{module}}/{{controllerUrl}}/edit', ['{{primaryKey}}' => $v['{{primaryKey}}']]) ?>">
                         <div class="btn btn-primary btn-sm"><i class="glyphicon glyphicon-pencil"></i> 编辑</div>
                     </a>
                     <div class="btn btn-danger btn-sm remove-btn" data-{{primaryKey}}="<?= $v['{{primaryKey}}'] ?>">

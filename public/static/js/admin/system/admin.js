@@ -150,9 +150,11 @@ function saveForm() {
     for (var i in data) {
         formData.append(data[i].name, data[i].value);
     }
-    if ($('input[type=file]').val().length) {
-        formData.append('file', $('input[type=file]')[0].files[0]);
-    }
+    form.find('input[type=file]').each(function () {
+        if ($(this).val().length) {
+            formData.append($(this).attr('name'), $(this)[0].files[0]);
+        }
+    });
     $.loading('show');
     $.ajax({
         url: form.attr('action'),
@@ -181,9 +183,11 @@ function changeUserForm() {
     for (let i in data) {
         formData.append(data[i].name, data[i].value);
     }
-    if ($('input[type=file]').val().length) {
-        formData.append('file', $('input[type=file]')[0].files[0]);
-    }
+    form.find('input[type=file]').each(function () {
+        if ($(this).val().length) {
+            formData.append($(this).attr('name'), $(this)[0].files[0]);
+        }
+    });
     $.loading('show');
     $.ajax({
         url: form.attr('action'),

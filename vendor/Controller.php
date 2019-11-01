@@ -106,35 +106,37 @@ class Controller extends ObjectAccess
      */
     public function parseFileOrUrl($key, $path = '/')
     {
-        $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
-        if (!empty($_FILES[$key])) {
-            return $this->parseFile($_FILES[$key], $path);
-        } else if ($urlList = \App::$request->params[$key]) {
+        $res = [];
+        //如果是common目录下的文件需要移动到对应目录
+        if ($urlList = \App::$request->params[$key]) {
             if (!is_array($urlList)) {
                 $urlList = explode(',', $urlList);
             }
-            $res = [];
             $baseUrl = \App::$config->web_info['host'];
             foreach ($urlList as $url) {
-                if (strpos($url, $baseUrl . '/upload/common') !== 0) {
-                    throw new \Exception('文件格式有误');
+                if (strpos($url, $baseUrl . '/upload/common') === 0) {
+                    $filename = str_replace($baseUrl . '/upload/common/', '', $url);
+                    $oldFilePath = PUBLIC_PATH . 'upload/common/';
+                    $oldFilename = $oldFilePath . $filename;
+                    $newFilePath = PUBLIC_PATH . 'upload/' . $path;
+                    $newFilename = $newFilePath . $filename;
+                    if (!file_exists($newFilePath)) {
+                        mkdir($newFilePath, 0755, true);
+                    }
+                    if (file_exists($oldFilename)) {
+                        copy($oldFilename, $newFilename);
+                        unlink($oldFilename);
+                    }
+                    $res[] = $baseUrl . '/upload/' . $path . $filename;
+                } else {
+                    $res[] = $url;
                 }
-                $filename = str_replace($baseUrl . '/upload/common/', '', $url);
-                $oldFilePath = PUBLIC_PATH . 'upload/common/';
-                $oldFilename = $oldFilePath . $filename;
-                $newFilePath = PUBLIC_PATH . 'upload/' . $path;
-                $newFilename = $newFilePath . $filename;
-                if (!file_exists($newFilePath)) {
-                    mkdir($newFilePath, 0755, true);
-                }
-                if (file_exists($oldFilename)) {
-                    copy($oldFilename, $newFilename);
-                    unlink($oldFilename);
-                }
-                $res[] = $baseUrl . '/upload/' . $path . $filename;
             }
-            return implode(',', $res);
         }
-        return '';
+        $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
+        if (!empty($_FILES[$key])) {
+            $res[] = $this->parseFile($_FILES[$key], $path);
+        }
+        return implode(',', $res);
     }
 }

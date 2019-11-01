@@ -120,7 +120,20 @@ class Generate extends \ObjectAccess
 
         }
         $statusJs = '';
-        if (isset($this->option['fcomment']['status'])) {
+        if (isset($this->option['fcomment']['status']) && $this->option['fchoice']['status'] == 1 && count(($statusList = $this->getChooseList('status')['list'])) == 2) {
+            $statusPartJs = '';
+            foreach ($statusList as $k => $v) {
+                $statusPartJs .= '
+                if (args.status == ' . $k . ') {
+                    data = {
+                        \'btn_class\': \'' . ($k == 0 ? 'btn-success' : 'btn-danger') . '\',
+                        \'class_name\': \'' . ($k == 0 ? 'glyphicon-ok-circle' : 'glyphicon-remove-circle') . '\',
+                        \'status\': \'' . ($k == 0 ? 1 : 0) . '\',
+                        \'name\': \'' . ($k == 0 ? '启用' : '禁用') . '\',
+                        \'title\': \'' . $v . '\',
+                    };
+                }';
+            }
             $statusJs = PHP_EOL . '    $(\'.set-status-btn\').click(function () {
         let $this = $(this);
         let tr = $(this).parents(\'tr\');
@@ -132,23 +145,7 @@ class Generate extends \ObjectAccess
         $.post($this.data(\'url\'), args, function (res) {
             $.loading(\'hide\');
             if (res.code == 200) {
-                $.success(res.message);
-                var data = {
-                    \'btn_class\': \'btn-danger\',
-                    \'class_name\': \'glyphicon-remove-circle\',
-                    \'status\': 0,
-                    \'name\': \'下架\',
-                    \'title\': \'正常\',
-                };
-                if (args.status == 0) {
-                    data = {
-                        \'btn_class\': \'btn-success\',
-                        \'class_name\': \'glyphicon-ok-circle\',
-                        \'status\': 1,
-                        \'name\': \'上架\',
-                        \'title\': \'已下架\',
-                    };
-                }
+                $.success(res.message);' . $statusPartJs . '
                 tr.find(\'.status\').html(data.title);
                 $this.data(\'status\', data.status);
                 $this.removeClass(\'btn-success\').removeClass(\'btn-danger\').addClass(data.btn_class);
@@ -218,7 +215,7 @@ class Generate extends \ObjectAccess
             $inputParams .= PHP_EOL . '        </div>';
             $inputParams .= PHP_EOL . '    </div>';
         }
-        $filename = $dir . '/edit-' . $this->controllerUrl . '.php';
+        $filename = $dir . '/edit.php';
         $file = $this->templatePath . 'view/edit';
         $str = file_get_contents($file);
         $str = str_replace('{{table}}', $this->table, $str);
@@ -241,21 +238,25 @@ class Generate extends \ObjectAccess
             $res = $this->getChooseList($field);
             if (isset($this->option['fpageshow'][$field]) && $this->option['fpageshow'][$field] == 1) {
                 $header .= PHP_EOL . '            <th>' . $label . '</th>';
+                $statusHtml = '';
+                if ($field == 'status' && $this->option['fchoice'][$field] == 1 && count($res['list']) == 2) {
+                    $statusHtml = ' class="status"';
+                }
                 if (in_array($this->option['ftype'][$field], ['select', 'radio', 'checkbox'])) {
-                    $body .= PHP_EOL . '                <td><?= $this->' . $res['variable'] . '[$v[\'' . $field . '\']] ?></td>';
+                    $body .= PHP_EOL . '                <td' . $statusHtml . '><?= $this->' . $res['variable'] . '[$v[\'' . $field . '\']] ?></td>';
                 } else if ($this->option['ftype'][$field] == 'date') {
-                    $body .= PHP_EOL . '                <td><?= date(\'Y-m-d\', $v[\'' . $field . '\']) ?></td>';
+                    $body .= PHP_EOL . '                <td' . $statusHtml . '><?= date(\'Y-m-d\', $v[\'' . $field . '\']) ?></td>';
 
                 } else if ($this->option['ftype'][$field] == 'datetime') {
-                    $body .= PHP_EOL . '                <td><?= date(\'Y-m-d H:i:s\', $v[\'' . $field . '\']) ?></td>';
+                    $body .= PHP_EOL . '                <td' . $statusHtml . '><?= date(\'Y-m-d H:i:s\', $v[\'' . $field . '\']) ?></td>';
                 } else if ($this->option['ftype'][$field] == 'image') {
-                    $body .= PHP_EOL . '                <td>';
+                    $body .= PHP_EOL . '                <td' . $statusHtml . '>';
                     $body .= PHP_EOL . '                    <?php if ($v[\'' . $field . '\']): ?>';
                     $body .= PHP_EOL . '                        <img src="<?= $v[\'' . $field . '\'] ?>" style="width: 60px;height: 60px;">';
                     $body .= PHP_EOL . '                    <?php endif; ?>';
-                    $body .= PHP_EOL . '                </td>';
+                    $body .= PHP_EOL . '                </td' . $statusHtml . '>';
                 } else {
-                    $body .= PHP_EOL . '                <td><?= $v[\'' . $field . '\'] ?></td>';
+                    $body .= PHP_EOL . '                <td' . $statusHtml . '><?= $v[\'' . $field . '\'] ?></td>';
                 }
             }
             if (isset($this->option['fpagesearch1'][$field]) && $this->option['fpagesearch1'][$field] == 1) {
@@ -280,7 +281,7 @@ class Generate extends \ObjectAccess
         }
         $searchList = '[' . implode(', ', $searchs) . ']';
         $statusIndex = '';
-        if (isset($this->option['fcomment']['status'])) {
+        if (isset($this->option['fcomment']['status']) && $this->option['fchoice']['status'] == 1 && count(($statusList = $this->getChooseList('status')['list'])) == 2) {
             $statusIndex = PHP_EOL . '                    <?php if ($v[\'status\'] == 1): ?>
                         <div class="btn btn-danger btn-sm set-status-btn" data-id="<?= $v[\'' . $this->primaryKey . '\'] ?>"
                              data-url="<?= \App::$urlManager->createUrl(\'' . $this->module . '/' . $this->controllerUrl . '/set-status\') ?>"
@@ -373,14 +374,13 @@ class Generate extends \ObjectAccess
                     $otherAssign .= PHP_EOL . '        $this->assign(\'' . $res['variable'] . '\', $' . $res['variable'] . ');';
                 }
             } else if ($this->option['ftype'][$field] == 'image') {
-                $parseFile .= PHP_EOL . '                if (!empty($_FILES[\'' . $field . '\'])) {';
-                $parseFile .= PHP_EOL . '                    $params[\'' . $field . '\'] = $this->parseFile($_FILES[\'' . $field . '\']);';
-                $parseFile .= PHP_EOL . '                }';
+                $parseFile .= PHP_EOL . '                $params[\'' . $field . '\'] = $this->parseFileOrUrl(\'' . $field . '\',\'' . $this->module . '/' . $this->controllerUrl . '\');';
             }
         }
         $statusAction = '';
-        if (isset($this->option['fcomment']['status'])) {
-            $statusAction = '/**
+        if (isset($this->option['fcomment']['status']) && $this->option['fchoice']['status'] == 1 && count(($statusList = $this->getChooseList('status')['list'])) == 2) {
+            $statusAction = PHP_EOL . '
+    /**
      * @throws \Exception
      */
     public function setStatusAction()

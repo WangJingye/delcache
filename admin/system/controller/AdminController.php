@@ -43,10 +43,7 @@ class AdminController extends BaseController
         $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                if (!empty($_FILES['file'])) {
-                    $file = $_FILES['file'];
-                    $params['avatar'] = $this->parseFile($file);
-                }
+                $params['avatar'] = $this->parseFileOrUrl('avatar', 'admin');
                 $this->adminService->saveAdmin($params);
                 $this->success('保存成功');
             } catch (\Exception $e) {
@@ -111,12 +108,9 @@ class AdminController extends BaseController
     {
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $params = \App::$request->params->toArray();
-                if (!empty($_FILES['file'])) {
-                    $file = $_FILES['file'];
-                    $params['avatar'] = $this->parseFile($file);
-                }
                 $user = \App::$user;
+                $params = \App::$request->params->toArray();
+                $params['avatar'] = $this->parseFileOrUrl('avatar', 'admin');
                 $params['admin_id'] = $user['admin_id'];
                 $params['username'] = $user['username'];
                 $this->adminService->saveAdmin($params);

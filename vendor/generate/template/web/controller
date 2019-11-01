@@ -37,7 +37,7 @@ class {{table}}Controller extends BaseController
     /**
      * @throws \Exception
      */
-    public function edit{{table}}Action()
+    public function editAction()
     {
         $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
