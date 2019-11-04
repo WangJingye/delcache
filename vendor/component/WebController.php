@@ -83,6 +83,7 @@ class WebController extends \Controller
             $startPage = $service->page - $leftCount;
             $endPage = $service->page + $rightCount;
         }
+        $params = \App::$request->params->toArray();
         $params['pageSize'] = $service->pageSize;
         $html = '<div class="pagination-list"><div class="page-container">共' . $service->total . '条 <select name="pageSize" style="margin-left: 1rem;margin-right: .5rem;" id="page-size">';
         foreach ([10, 20, 50, 100] as $i) {
