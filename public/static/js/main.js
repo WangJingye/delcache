@@ -99,14 +99,13 @@ $(function () {
         }
         form.submit();
     });
-    if($('.kindeditor').get(0)){
-        KindEditor.ready(function(K) {
-            K.create('.kindeditor', {
-                allowFileManager : false,
-                uploadJson : '/system/upload/index',
-                afterBlur: function(){this.sync();}
-            });
-
+    if ($('.kindeditor').get(0)) {
+        KindEditor.create('.kindeditor', {
+            allowFileManager: false,
+            uploadJson: '/system/upload/index',
+            afterBlur: function () {
+                this.sync();
+            }
         });
     }
 });
