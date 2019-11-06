@@ -6,6 +6,8 @@ class Controller extends ObjectAccess
 
     public function init()
     {
+        $siteInfo = Db::table('SiteInfo')->find();
+        \App::$config['site_info'] = $siteInfo ? $siteInfo : new ObjectAccess();
     }
 
     public function before()
@@ -93,7 +95,7 @@ class Controller extends ObjectAccess
                     throw new \Exception('文件保存失败');
                 }
             }
-            $res[] = App::$config->web_info['host'] . '/' . $filename;
+            $res[] = App::$config['site_info']['web_host'] . '/' . $filename;
         }
         return implode(',', $res);
     }
@@ -112,7 +114,7 @@ class Controller extends ObjectAccess
             if (!is_array($urlList)) {
                 $urlList = explode(',', $urlList);
             }
-            $baseUrl = \App::$config->web_info['host'];
+            $baseUrl = \App::$config['site_info']['web_host'];
             foreach ($urlList as $url) {
                 if (strpos($url, $baseUrl . '/upload/common') === 0) {
                     $filename = str_replace($baseUrl . '/upload/common/', '', $url);

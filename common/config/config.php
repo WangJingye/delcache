@@ -30,15 +30,5 @@ $configs = [
         // 默认操作名
         'default_action' => 'index',
     ],
-    'wechat' => [
-        'app_id' => '',//小程序ID
-        'app_secret' => '',//小程序密钥
-        'mch_id' => '',//商户ID
-        'pay_key' => '',//商户支付Key
-    ],
-    'web_info' => [
-        'host' => 'https://www.delcache.com',
-        'ip' => '121.40.224.59',
-    ],
 ];
 return $configs;

@@ -1,3 +1,17 @@
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+# Dump of table tbl_admin
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_admin`;
+
 CREATE TABLE `tbl_admin` (
   `admin_id` int(10) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` varchar(50) NOT NULL DEFAULT '' COMMENT '用户名称',
@@ -17,6 +31,22 @@ CREATE TABLE `tbl_admin` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='后台用户表';
 
+LOCK TABLES `tbl_admin` WRITE;
+/*!40000 ALTER TABLE `tbl_admin` DISABLE KEYS */;
+
+INSERT INTO `tbl_admin` (`admin_id`, `username`, `password`, `realname`, `mobile`, `email`, `avatar`, `salt`, `identity`, `last_login_time`, `passwd_modify_time`, `create_time`, `update_time`, `status`)
+VALUES
+	(1,'admin','de5adcf92bd1be1f221e3bad88f97f6e','超级管理员','','11@qq.com','','6544',1,1572937618,0,1566546983,1572591787,1);
+
+/*!40000 ALTER TABLE `tbl_admin` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table tbl_menu
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_menu`;
+
 CREATE TABLE `tbl_menu` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
   `name` varchar(50) NOT NULL DEFAULT '' COMMENT '菜单名称',
@@ -31,6 +61,9 @@ CREATE TABLE `tbl_menu` (
   PRIMARY KEY (`id`),
   KEY `pid` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='后台菜单数据表';
+
+LOCK TABLES `tbl_menu` WRITE;
+/*!40000 ALTER TABLE `tbl_menu` DISABLE KEYS */;
 
 INSERT INTO `tbl_menu` (`id`, `name`, `url`, `desc`, `parent_id`, `icon`, `sort`, `status`, `create_time`, `update_time`)
 VALUES
@@ -49,7 +82,18 @@ VALUES
 	(13,'菜单启用/禁用','system/menu/set-status','',4,'',0,1,1562982765,1562982765),
 	(14,'账号启用/禁用','system/admin/set-status','',11,'',0,1,1562982765,1562982765),
 	(15,'重置密码','system/admin/reset-password','',11,'',0,1,1563005512,1564936542),
-	(16,'个人信息','system/admin/profile','',11,'',0,1,1563005512,1564936542);
+	(16,'个人信息','system/admin/profile','',11,'',0,1,1563005512,1564936542),
+	(17,'内容管理','','',2,'glyphicon glyphicon-bookmark',0,1,1572591987,1572591987),
+	(18,'网站信息','erp/site-info/edit','',17,'glyphicon glyphicon-bookmark',0,1,1573021780,1573021780);
+
+/*!40000 ALTER TABLE `tbl_menu` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table tbl_role
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_role`;
 
 CREATE TABLE `tbl_role` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '角色ID',
@@ -61,9 +105,21 @@ CREATE TABLE `tbl_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='角色表';
 
+LOCK TABLES `tbl_role` WRITE;
+/*!40000 ALTER TABLE `tbl_role` DISABLE KEYS */;
+
 INSERT INTO `tbl_role` (`id`, `name`, `desc`, `status`, `create_time`, `update_time`)
 VALUES
 	(1,'管理员','root',1,1562982778,1562982993);
+
+/*!40000 ALTER TABLE `tbl_role` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table tbl_role_admin
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_role_admin`;
 
 CREATE TABLE `tbl_role_admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -73,6 +129,13 @@ CREATE TABLE `tbl_role_admin` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
+
+
+# Dump of table tbl_role_menu
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_role_menu`;
+
 CREATE TABLE `tbl_role_menu` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `role_id` int(11) NOT NULL COMMENT '角色ID',
@@ -81,3 +144,42 @@ CREATE TABLE `tbl_role_menu` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `role-menu` (`role_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
+
+
+
+# Dump of table tbl_site_info
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `tbl_site_info`;
+
+CREATE TABLE `tbl_site_info` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `wechat_app_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `wechat_app_secret` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `wechat_mch_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `wechat_pay_key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `web_host` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `web_ip` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `create_time` int(11) DEFAULT '0',
+  `update_time` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+LOCK TABLES `tbl_site_info` WRITE;
+/*!40000 ALTER TABLE `tbl_site_info` DISABLE KEYS */;
+
+INSERT INTO `tbl_site_info` (`id`, `wechat_app_id`, `wechat_app_secret`, `wechat_mch_id`, `wechat_pay_key`, `web_host`, `web_ip`, `create_time`, `update_time`)
+VALUES
+	(1,'','','','','https://api.delcache.com','121.40.224.59',1573022804,1573022829);
+
+/*!40000 ALTER TABLE `tbl_site_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
