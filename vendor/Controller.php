@@ -147,7 +147,6 @@ class Controller extends ObjectAccess
                 $res[($i + 1000)] = $new;
             }
         }
-
         ksort($res);
         return implode(',', $res);
     }

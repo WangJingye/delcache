@@ -35,7 +35,7 @@
             <div class="form-group row">
                 <label class="col-sm-4 text-nowrap col-form-label form-label">个人头像</label>
                 <div class="col-sm-8">
-                    <?= \admin\extend\image\ImageInput::instance(\App::$user['avatar'], 'avatar',9)->show(); ?>
+                    <?= \admin\extend\image\ImageInput::instance(\App::$user['avatar'], 'avatar')->show(); ?>
                 </div>
             </div>
             <div class="form-group row">
