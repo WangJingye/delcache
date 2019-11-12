@@ -15,9 +15,6 @@ class ImageInput extends \ObjectAccess
         if (!is_array($images)) {
             $images = $images ? explode(',', $images) : [];
         }
-        if ($count > 1) {
-            $name = $name . '[]';
-        }
         $this->name = $name;
         $this->images = $images;
         $this->count = $count;
@@ -31,9 +28,6 @@ class ImageInput extends \ObjectAccess
             if (!is_array($images)) {
                 $images = $images ? explode(',', $images) : [];
             }
-            if ($count > 1) {
-                $name = $name . '[]';
-            }
             self::$instance->name = $name;
             self::$instance->images = $images;
             self::$instance->count = $count;
@@ -44,23 +38,31 @@ class ImageInput extends \ObjectAccess
     public function show()
     {
         $html = '<div class="fileinput-box-list" data-max="' . $this->count . '">';
-        foreach ($this->images as $image) {
+        foreach ($this->images as $key => $image) {
+            $name = $this->name;
+            if ($this->count != 1) {
+                $name = $name . '[' . $key . ']';
+            }
             $html .= ' <div class="fileinput-box">' .
                 '<img src="' . $image . '">' .
-                '<input type="hidden" name="' . $this->name . '" value="' . $image . '">' .
+                '<input type="hidden" name="' . $name . '" value="' . $image . '">' .
                 '<div class="fileinput-button">' .
                 '<div class="plus-symbol" style="display: none">+</div>' .
-                '<input class="fileinput-input" type="file" name="' . $this->name . '">' .
+                '<input class="fileinput-input" type="file" name="' . $name . '">' .
                 '</div>' .
                 '<div class="file-remove-btn">' .
                 '<div class="btn btn-sm btn-outline-danger" style="font-size: 0.5rem;">删除</div>' .
                 '</div></div>';
         }
         if (count($this->images) < $this->count) {
+            $name = $this->name;
+            if ($this->count != 1) {
+                $name = $name . '[]';
+            }
             $html .= ' <div class="fileinput-box">' .
                 '<div class="fileinput-button">' .
                 '<div class="plus-symbol" > +</div >' .
-                '<input class="fileinput-input add-new" type = "file" name = "'.$this->name.'" >' .
+                '<input class="fileinput-input add-new" type = "file" name = "' . $name . '" >' .
                 '</div ></div >';
         }
         $html .= '</div>';
