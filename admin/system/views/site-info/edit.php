@@ -1,6 +1,13 @@
 <form class="form-box col-12 col-sm-8 col-md-6" id="save-form"
-      action="<?= \App::$urlManager->createUrl('erp/site-info/edit') ?>" method="post">
-    <input type="hidden" name="id" value="<?= $this->model['id'] ?>">
+      action="<?= \App::$urlManager->createUrl('system/site-info/edit') ?>" method="post">
+
+    <div class="form-group row">
+        <label class="col-sm-4 text-nowrap col-form-label form-label">用户初始密码</label>
+        <div class="col-sm-8">
+            <input type="password" name="default_password" class="form-control" value="<?= $this->model['default_password'] ?>"
+                   placeholder="请输入用户初始密码">
+        </div>
+    </div>
     <div class="form-group row">
         <label class="col-sm-4 text-nowrap col-form-label form-label">微信APPID</label>
         <div class="col-sm-8">

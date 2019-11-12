@@ -52,7 +52,7 @@ class AdminService extends BaseService
             \Db::table('Admin')->where(['admin_id' => $data['admin_id']])->update($data);
         } else {
             $data['salt'] = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-            $password = \App::$config->default_password;
+            $password = \App::$config['site_info']['default_password'];
             $data['password'] = Encrypt::encryptPassword($password, $data['salt']);
             \Db::table('Admin')->insert($data);
         }

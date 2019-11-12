@@ -13,6 +13,7 @@ class Db extends ObjectAccess
     private $order = '';
     private $rename = '';
     private $join = [];
+    private $db_fields = [];
 
     /**
      * Db constructor.
@@ -392,14 +393,34 @@ class Db extends ObjectAccess
     }
 
     /**
+     * @param $data
+     * @throws Exception
+     */
+    public function save($data)
+    {
+        $fields = $this->getFields();
+        foreach ($fields as $field => $v) {
+            //主键
+            if ($v['Key'] == 'PRI' && (isset($data[$field]) && $data[$field] !== '')) {
+                $this->update($data);
+            } else {
+                $this->insert($data);
+            }
+        }
+    }
+
+    /**
      * @return array
      * @throws \Exception
      */
     public function getFields()
     {
-        $sql = 'show columns from ' . $this->table_name . ';';
-        $rows = $this->findAll($sql);
-        return array_column($rows, null, 'Field');
+        if (!count($this->db_fields)) {
+            $sql = 'show columns from ' . $this->table_name . ';';
+            $rows = $this->findAll($sql);
+            $this->db_fields = array_column($rows, null, 'Field');
+        }
+        return $this->db_fields;
     }
 
     /**

@@ -60,7 +60,7 @@ class Controller extends ObjectAccess
      * 文件上传处理
      * @param $file
      * @param bool $is_image
-     * @return string
+     * @return array
      * @throws \Exception
      */
     public function parseFile($file, $path = '/')
@@ -95,9 +95,9 @@ class Controller extends ObjectAccess
                     throw new \Exception('文件保存失败');
                 }
             }
-            $res[] = App::$config['site_info']['web_host'] . '/' . $filename;
+            $res[$i] = App::$config['site_info']['web_host'] . '/' . $filename;
         }
-        return implode(',', $res);
+        return $res;
     }
 
     /**
@@ -108,14 +108,13 @@ class Controller extends ObjectAccess
      */
     public function parseFileOrUrl($key, $path = '/')
     {
-        $res = [];
         //如果是common目录下的文件需要移动到对应目录
         if ($urlList = \App::$request->params[$key]) {
             if (!is_array($urlList)) {
                 $urlList = explode(',', $urlList);
             }
             $baseUrl = \App::$config['site_info']['web_host'];
-            foreach ($urlList as $url) {
+            foreach ($urlList as $i => $url) {
                 if (strpos($url, $baseUrl . '/upload/common') === 0) {
                     $filename = str_replace($baseUrl . '/upload/common/', '', $url);
                     $oldFilePath = PUBLIC_PATH . 'upload/common/';
@@ -129,16 +128,27 @@ class Controller extends ObjectAccess
                         copy($oldFilename, $newFilename);
                         unlink($oldFilename);
                     }
-                    $res[] = $baseUrl . '/upload/' . $path . $filename;
+                    $res[$i] = $baseUrl . '/upload/' . $path . $filename;
                 } else {
-                    $res[] = $url;
+                    $res[$i] = $url;
                 }
             }
         }
         $path = trim($path, '/') != '' ? trim($path, '/') . '/' : '';
         if (!empty($_FILES[$key])) {
-            $res[] = $this->parseFile($_FILES[$key], $path);
+            $files = $this->parseFile($_FILES[$key], $path);
+            foreach ($files as $i => $new) {
+                $res[$i] = $new;
+            }
         }
+        if (!empty($_FILES[$key . '_add'])) {
+            $files = $this->parseFile($_FILES[$key . '_add'], $path);
+            foreach ($files as $i => $new) {
+                $res[($i + 1000)] = $new;
+            }
+        }
+
+        ksort($res);
         return implode(',', $res);
     }
 }

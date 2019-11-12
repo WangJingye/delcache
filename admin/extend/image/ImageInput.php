@@ -57,7 +57,7 @@ class ImageInput extends \ObjectAccess
         if (count($this->images) < $this->count) {
             $name = $this->name;
             if ($this->count != 1) {
-                $name = $name . '[]';
+                $name = $name . '_add[]';
             }
             $html .= ' <div class="fileinput-box">' .
                 '<div class="fileinput-button">' .

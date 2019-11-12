@@ -1,18 +1,14 @@
 <?php
 
-namespace admin\erp\controller;
+namespace admin\system\controller;
 
 use admin\common\controller\BaseController;
-use admin\erp\service\SiteInfoService;
 
 class SiteInfoController extends BaseController
 {
-    /** @var SiteInfoService */
-    public $siteInfoService;
 
     public function init()
     {
-        $this->siteInfoService = new SiteInfoService();
         parent::init();
     }
 
@@ -24,7 +20,12 @@ class SiteInfoController extends BaseController
         $params = \App::$request->params->toArray();
         if (\App::$request->isAjax() && \App::$request->isPost()) {
             try {
-                $this->siteInfoService->saveSiteInfo($params);
+                $siteInfo = \Db::table('SiteInfo')->find();
+                if ($siteInfo) {
+                    \Db::table('SiteInfo')->update($params);
+                } else {
+                    \Db::table('SiteInfo')->insert($params);
+                }
                 $this->success('保存成功');
             } catch (\Exception $e) {
                 $this->error($e->getMessage());
