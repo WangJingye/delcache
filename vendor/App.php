@@ -87,7 +87,7 @@ class App extends ObjectAccess
             if (APP_DEBUG) {
                 throw new \Exception($e->getMessage(), $e->getCode());
             }
-            $view = COMMON_PATH . 'layout/' . $errorCode . '.php';
+            $view = APP_PATH . 'common/' . 'layout/' . $errorCode . '.php';
             if (file_exists($view)) {
                 include $view;
                 exit();
