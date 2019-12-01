@@ -251,10 +251,16 @@ class Db extends ObjectAccess
      */
     public function update($data)
     {
+        $fields = $this->getFields();
         if (!isset($data['update_time']) || $data['update_time'] == '') {
-            $fields = $this->getFields();
             if (isset($fields['update_time'])) {
                 $data['update_time'] = time();
+            }
+        }
+        //删除不存在字段
+        foreach ($data as $key => $value) {
+            if (!isset($fields[$key])) {
+                unset($data[$key]);
             }
         }
         $sql = $this->array2sql($this->table_name, $data, 'update', $this->condition);
@@ -314,6 +320,12 @@ class Db extends ObjectAccess
                 break;
             }
         }
+        //删除不存在字段
+        foreach ($data as $key => $value) {
+            if (!isset($fields[$key])) {
+                unset($data[$key]);
+            }
+        }
         $sql = $this->array2sql($this->table_name, $data);
         if ($this->db->exec($sql) === false) {
             $error = $this->db->errorInfo();
@@ -353,6 +365,12 @@ class Db extends ObjectAccess
                     }
                 }
                 break;
+            }
+        }
+        //删除不存在字段
+        foreach ($data as $key => $value) {
+            if (!isset($fields[$key])) {
+                unset($data[$key]);
             }
         }
         $dataSql = [];
@@ -508,6 +526,14 @@ class Db extends ObjectAccess
             $sql = 'update ' . $tableName . ' set ' . implode(',', $fields) . $condition;
         }
         return $sql;
+    }
+
+    public function exec($sql)
+    {
+        if ($this->db->exec($sql) === false) {
+            $error = $this->db->errorInfo();
+            throw new \Exception($error[2]);
+        }
     }
 
 

@@ -120,17 +120,6 @@ class MenuService extends BaseService
      */
     public function getLeftList()
     {
-        $selector = \Db::table('Menu')
-            ->where(['status' => 1]);
-        if (\App::$user['identity'] == 0) {
-            $roleMenus = \Db::table('RoleMenu')->rename('a')
-                ->join(['b' => 'RoleAdmin'], 'a.role_id = b.role_id')
-                ->field(['a.menu_id'])
-                ->where(['b.admin_id' => \App::$user['admin_id']])
-                ->findAll();
-            $roleMenus = array_column($roleMenus, 'menu_id');
-            $selector->where(['id' => ['in', $roleMenus]]);
-        }
         $menuList = $this->getAdminMenus();
         $activeList = $this->getActiveMenu();
         $topList = [];
